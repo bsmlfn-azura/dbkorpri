@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Kwitansi 21x9cm (G-Sheet)</title>
+    <title>Sistem Kwitansi 21x9cm + Kop Instansi</title>
     <style>
         :root {
             --primary-color: #2563eb;
@@ -133,7 +133,7 @@
             background: white;
             padding: 2rem;
             border-radius: 8px;
-            max-width: 900px; /* Lebar modal agar muat preview 21cm */
+            max-width: 900px;
             width: 95%;
             max-height: 95vh;
             overflow-y: auto;
@@ -153,7 +153,7 @@
         }
         .toast.show { opacity: 1; }
 
-        /* --- CUSTOM PRINT STYLES (21cm x 9cm) --- */
+        /* --- PRINT STYLES (21cm x 9cm) --- */
         #print-area { display: none; }
 
         @media print {
@@ -167,7 +167,7 @@
                 width: 100%;
             }
             @page { 
-                size: 21cm 9cm portrait; /* Ukuran Custom */
+                size: 21cm 9cm portrait; 
                 margin: 0; 
             }
         }
@@ -180,60 +180,89 @@
             border: 1px dashed #ccc;
             margin: 0 auto;
             background: white;
-            font-family: 'Arial Narrow', Arial, sans-serif; /* Font lebih ramping agar muat */
+            font-family: 'Arial Narrow', Arial, sans-serif; 
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             overflow: hidden;
             display: flex;
-            flex-direction: row; /* Layout Horizontal */
+            flex-direction: column; /* Kolom Vertikal: Header di atas, Body di bawah */
             box-sizing: border-box;
         }
+
+        /* --- 1. BAGIAN KOP INSTANSI (Header) --- */
+        .letterhead {
+            text-align: center;
+            border-bottom: 3px double black; /* Garis ganda tebal */
+            padding-bottom: 3px;
+            margin-bottom: 5px;
+            position: relative;
+        }
+
+        .lh-row-1 { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 2px; }
+        .lh-logo { 
+            width: 35px; height: 35px; 
+            background-color: #ddd; 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            font-size: 8pt; font-weight: bold; color: #555;
+        }
+        .lh-text h2 { font-size: 10pt; font-weight: 900; text-transform: uppercase; margin: 0; line-height: 1.1; }
+        .lh-text h3 { font-size: 9pt; font-weight: 700; text-transform: uppercase; margin: 0; line-height: 1.1; }
+        .lh-address { font-size: 7pt; margin: 0; font-style: italic; }
+
+        .kwitansi-title-block {
+            margin-top: 2px;
+        }
+        .kw-title { font-size: 11pt; font-weight: bold; text-decoration: underline; text-transform: uppercase; }
+        .kw-no { font-size: 8pt; margin-top: 1px; }
+
+        /* --- 2. BAGIAN ISI (Body 3 Kolom) --- */
+        .content-columns {
+            display: flex;
+            flex: 1; /* Mengisi sisa tinggi kertas */
+            overflow: hidden;
+        }
         
-        /* Kolom Layout */
-        .col-left { width: 25%; border-right: 1px solid #ddd; padding-right: 5px; }
-        .col-mid { width: 45%; border-right: 1px solid #ddd; padding: 0 5px; }
+        .col-left { width: 26%; border-right: 1px solid #ddd; padding-right: 5px; }
+        .col-mid { width: 44%; border-right: 1px solid #ddd; padding: 0 5px; }
         .col-right { width: 30%; padding-left: 5px; display: flex; flex-direction: column; justify-content: flex-end; }
 
-        /* Typography */
-        .kw-header { text-align: center; border-bottom: 1px solid black; padding-bottom: 2px; margin-bottom: 5px; }
-        .kw-title { font-size: 12pt; font-weight: bold; text-transform: uppercase; }
-        .kw-no { font-size: 8pt; }
-        
-        .kw-body { font-size: 8pt; line-height: 1.2; }
+        /* Typography Body */
+        .kw-body { font-size: 8pt; line-height: 1.1; }
         
         .row-label { font-size: 7pt; color: #555; margin-bottom: 1px; }
-        .row-value { font-size: 8pt; font-weight: bold; margin-bottom: 4px; border-bottom: 1px dotted #ccc; min-height: 12px;}
+        .row-value { font-size: 8pt; font-weight: bold; margin-bottom: 3px; border-bottom: 1px dotted #ccc; min-height: 11px;}
 
         .terbilang-box { 
-            font-style: italic; font-size: 7.5pt; 
-            margin: 5px 0; padding: 3px; 
+            font-style: italic; font-size: 7pt; 
+            margin: 3px 0; padding: 2px; 
             background: #f9f9f9; border: 1px solid #eee;
         }
 
         /* Table Custom */
-        .kw-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin-top: 5px; }
-        .kw-table th, .kw-table td { border: 1px solid black; padding: 1px 3px; }
-        .kw-table th { background-color: #eee; text-align: center; font-size: 7pt; }
-        .kw-table td:nth-child(2) { text-align: center; } /* Jml */
-        .kw-table td:nth-child(3) { text-align: right; } /* Nominal */
-        .kw-table td:nth-child(4) { text-align: right; } /* Jumlah */
+        .kw-table { width: 100%; border-collapse: collapse; font-size: 7.5pt; margin-top: 2px; }
+        .kw-table th, .kw-table td { border: 1px solid black; padding: 0px 2px; }
+        .kw-table th { background-color: #eee; text-align: center; font-size: 6.5pt; }
+        .kw-table td:nth-child(2) { text-align: center; } 
+        .kw-table td:nth-child(3) { text-align: right; } 
+        .kw-table td:nth-child(4) { text-align: right; } 
         .kw-total td { font-weight: bold; background: #f0f0f0; }
 
         /* Signature */
-        .sig-box { text-align: center; margin-bottom: 10px; }
-        .sig-name { text-decoration: underline; font-weight: bold; font-size: 8pt; margin-top: 5px; display: block;}
-        .sig-space { height: 25px; }
-        .sig-date { font-size: 7pt; margin-bottom: 2px; }
+        .sig-box { text-align: center; margin-bottom: 5px; }
+        .sig-name { text-decoration: underline; font-weight: bold; font-size: 7.5pt; margin-top: 3px; display: block;}
+        .sig-space { height: 20px; }
+        .sig-date { font-size: 6.5pt; margin-bottom: 1px; }
 
         /* Total Box di Kanan */
         .total-box {
             background: #eee;
             border: 1px solid black;
-            padding: 5px;
-            margin-bottom: auto; /* Push down */
+            padding: 3px;
+            margin-bottom: auto;
             text-align: right;
         }
-        .total-label { font-size: 8pt; font-weight: bold; }
-        .total-amount { font-size: 10pt; font-weight: bold; color: #000; }
+        .total-label { font-size: 7pt; font-weight: bold; }
+        .total-amount { font-size: 9pt; font-weight: bold; color: #000; }
 
     </style>
 </head>
@@ -241,7 +270,7 @@
 
     <!-- Sidebar -->
     <aside>
-        <h1>Keuangan OPD <br><small style="font-size:0.7em; color:#666">(21x9 cm)</small></h1>
+        <h1>Keuangan OPD <br><small style="font-size:0.7em; color:#666">(Kop Instansi)</small></h1>
         <nav>
             <button id="nav-entry" class="active" onclick="switchTab('entry')">📝 Entri Transaksi</button>
             <button id="nav-report" onclick="switchTab('report')">📊 Laporan Data (Sheet)</button>
@@ -382,7 +411,7 @@
     <div class="modal-overlay" id="printModal">
         <div class="modal-content">
             <span class="close-modal" onclick="closePrintModal()">&times;</span>
-            <h2 style="margin-bottom: 1rem; text-align: center;">Preview Kwitansi (21cm x 9cm)</h2>
+            <h2 style="margin-bottom: 1rem; text-align: center;">Preview Kwitansi (21x9 cm + Kop)</h2>
             
             <div class="receipt-preview" id="a6PreviewContent">
                 <!-- Content injected via JS -->
@@ -610,86 +639,110 @@
 
         function generateReceiptHTML(data) {
             const d = data.details;
-            // Layout Horizontal 3 Kolom
-            return `
-                <!-- KOLOM KIRI: INFO -->
-                <div class="col-left">
-                    <div class="kw-header">
+            
+            // --- BAGIAN EDIT: SESUAIKAN NAMA INSTANSI DI SINI ---
+            const kopInstansi = `
+                <div class="letterhead">
+                    <div class="lh-row-1">
+                        <div class="lh-logo">LOGO</div>
+                        <div class="lh-text">
+                            <h2>PEMERINTAH KOTA BANDUNG</h2>
+                            <h3>DINAS KOMUNIKASI DAN INFORMATIKA</h3>
+                        </div>
+                        <div class="lh-logo" style="background:transparent; border:1px solid #ccc; font-size:6pt;">GARUDA</div>
+                    </div>
+                    <p class="lh-address">Jl. Wastu Kencana No. 1 Bandung 40111, Telp (022) 4235052</p>
+                    
+                    <div class="kwitansi-title-block">
                         <div class="kw-title">KWITANSI</div>
                         <div class="kw-no">No: ${data.receiptNo}</div>
                     </div>
+                </div>
+            `;
+            // -----------------------------------------------------
+
+            return `
+                <!-- 1. KOP INSTANSI (FULL WIDTH) -->
+                ${kopInstansi}
+
+                <!-- 2. ISI DATA (3 KOLOM) -->
+                <div class="content-columns">
                     
-                    <div class="kw-body">
-                        <div class="row-label">Telah terima dari</div>
-                        <div class="row-value" style="text-transform: capitalize;">${data.depositor}</div>
-                        
-                        <div class="row-label">Untuk Pembayaran</div>
-                        <div class="row-value">${data.opd}</div>
-                        
-                        <div class="terbilang-box">
-                            "${terbilang(data.totalBayar)} Rupiah"
+                    <!-- KOLOM KIRI: INFO -->
+                    <div class="col-left">
+                        <div class="kw-body">
+                            <div class="row-label">Telah terima dari</div>
+                            <div class="row-value" style="text-transform: capitalize;">${data.depositor}</div>
+                            
+                            <div class="row-label">Untuk Pembayaran</div>
+                            <div class="row-value">${data.opd}</div>
+                            
+                            <div class="terbilang-box">
+                                "${terbilang(data.totalBayar)} Rupiah"
+                            </div>
+
+                            <div style="margin-top:3px; font-size: 7pt;">
+                                Tgl Setor: ${formatDate(data.depositDate)}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KOLOM TENGAH: TABEL -->
+                    <div class="col-mid">
+                        <div style="font-size: 7.5pt; font-weight: bold; text-align: center; margin-bottom: 2px; text-decoration: underline;">
+                            RINCIAN BIAYA
+                        </div>
+                        <table class="kw-table">
+                            <thead>
+                                <tr>
+                                    <th>Ket</th>
+                                    <th>Jml</th>
+                                    <th>Hrg</th>
+                                    <th>Jumlah</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Gol 1</td><td align="center">${d.q1}</td><td align="right">${RATES.g1}</td><td align="right">${d.s1}</td></tr>
+                                <tr><td>Gol 2</td><td align="center">${d.q2}</td><td align="right">${RATES.g2}</td><td align="right">${d.s2}</td></tr>
+                                <tr><td>Gol 3</td><td align="center">${d.q3}</td><td align="right">${RATES.g3}</td><td align="right">${d.s3}</td></tr>
+                                <tr><td>Gol 4</td><td align="center">${d.q4}</td><td align="right">${RATES.g4}</td><td align="right">${d.s4}</td></tr>
+                                <tr class="kw-total">
+                                    <td colspan="3" align="center">TOTAL</td>
+                                    <td align="right">${formatRupiah(data.totalBayar)}</td>
+                                </tr>
+                                <tr class="kw-total" style="background: #e0e0e0;">
+                                    <td colspan="3" align="center" style="font-size:6.5pt;">BAYAR 50%</td>
+                                    <td align="right" style="font-size:6.5pt;">${formatRupiah(data.bayar50)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- KOLOM KANAN: TOTAL & TTD -->
+                    <div class="col-right">
+                        <div class="total-box">
+                            <div class="total-label">TOTAL BAYAR</div>
+                            <div class="total-amount">${formatRupiah(data.totalBayar)}</div>
                         </div>
 
-                        <div style="margin-top:5px; font-size: 7pt;">
-                            Tgl Setor: ${formatDate(data.depositDate)}
+                        <div style="flex-grow: 1;"></div> 
+
+                        <div class="sig-box">
+                            <div class="sig-date">${formatDate(data.printDate)}</div>
+                            <div style="font-size: 7.5pt;">Penyetor,</div>
+                            <div class="sig-space"></div>
+                            <span class="sig-name">${data.depositor}</span>
+                        </div>
+
+                        <div class="sig-box">
+                            <div class="sig-date">${formatDate(data.printDate)}</div>
+                            <div style="font-size: 7.5pt;">Bendahara,</div>
+                            <div class="sig-space"></div>
+                            <span class="sig-name">Nama Petugas</span>
+                            <div style="font-size: 6pt;">NIP. ...................</div>
                         </div>
                     </div>
-                </div>
 
-                <!-- KOLOM TENGAH: TABEL -->
-                <div class="col-mid">
-                    <div style="font-size: 8pt; font-weight: bold; text-align: center; margin-bottom: 3px; text-decoration: underline;">
-                        RINCIAN BIAYA
-                    </div>
-                    <table class="kw-table">
-                        <thead>
-                            <tr>
-                                <th>Ket</th>
-                                <th>Jml</th>
-                                <th>Hrg</th>
-                                <th>Jumlah</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Gol 1</td><td align="center">${d.q1}</td><td align="right">${RATES.g1}</td><td align="right">${d.s1}</td></tr>
-                            <tr><td>Gol 2</td><td align="center">${d.q2}</td><td align="right">${RATES.g2}</td><td align="right">${d.s2}</td></tr>
-                            <tr><td>Gol 3</td><td align="center">${d.q3}</td><td align="right">${RATES.g3}</td><td align="right">${d.s3}</td></tr>
-                            <tr><td>Gol 4</td><td align="center">${d.q4}</td><td align="right">${RATES.g4}</td><td align="right">${d.s4}</td></tr>
-                            <tr class="kw-total">
-                                <td colspan="3" align="center">TOTAL</td>
-                                <td align="right">${formatRupiah(data.totalBayar)}</td>
-                            </tr>
-                            <tr class="kw-total" style="background: #e0e0e0;">
-                                <td colspan="3" align="center" style="font-size:7pt;">BAYAR 50%</td>
-                                <td align="right" style="font-size:7pt;">${formatRupiah(data.bayar50)}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- KOLOM KANAN: TOTAL & TTD -->
-                <div class="col-right">
-                    <div class="total-box">
-                        <div class="total-label">TOTAL BAYAR</div>
-                        <div class="total-amount">${formatRupiah(data.totalBayar)}</div>
-                    </div>
-
-                    <div style="flex-grow: 1;"></div> <!-- Spacer -->
-
-                    <div class="sig-box">
-                        <div class="sig-date">${formatDate(data.printDate)}</div>
-                        <div style="font-size: 8pt;">Penyetor,</div>
-                        <div class="sig-space"></div>
-                        <span class="sig-name">${data.depositor}</span>
-                    </div>
-
-                    <div class="sig-box">
-                        <div class="sig-date">${formatDate(data.printDate)}</div>
-                        <div style="font-size: 8pt;">Bendahara,</div>
-                        <div class="sig-space"></div>
-                        <span class="sig-name">Nama Petugas</span>
-                        <div style="font-size: 6pt;">NIP. ...................</div>
-                    </div>
                 </div>
             `;
         }
