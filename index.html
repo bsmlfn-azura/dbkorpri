@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Kwitansi Terintegrasi Google Sheet</title>
+    <title>Sistem Kwitansi A6 Landscape (G-Sheet)</title>
     <style>
         :root {
             --primary-color: #2563eb;
@@ -133,9 +133,9 @@
             background: white;
             padding: 2rem;
             border-radius: 8px;
-            max-width: 800px;
-            width: 90%;
-            max-height: 90vh;
+            max-width: 900px; /* Sedikit lebih lebar untuk landscape preview */
+            width: 95%;
+            max-height: 95vh;
             overflow-y: auto;
             position: relative;
         }
@@ -153,7 +153,7 @@
         }
         .toast.show { opacity: 1; }
 
-        /* --- A6 PRINT STYLES --- */
+        /* --- A6 LANDSCAPE PRINT STYLES --- */
         #print-area { display: none; }
 
         @media print {
@@ -166,41 +166,55 @@
                 top: 0;
                 width: 100%;
             }
-            @page { size: A6 portrait; margin: 0; }
+            /* PENGATURAN KERTAS A6 LANDSCAPE */
+            @page { 
+                size: A6 landscape; 
+                margin: 0; 
+            }
         }
 
-        /* Screen preview of A6 */
+        /* Screen preview of A6 LANDSCAPE */
         .a6-preview {
-            width: 105mm;
-            min-height: 148mm;
-            padding: 10mm;
+            /* A6 Landscape Dimensions: 148mm x 105mm */
+            width: 148mm; 
+            height: 105mm; 
+            padding: 8mm; /* Padding disesuaikan agar muat */
             border: 1px dashed #ccc;
             margin: 0 auto;
             background: white;
             font-family: 'Times New Roman', Times, serif;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            /* Tambahkan scroll jika konten terlalu panjang untuk preview */
+            overflow: hidden; 
         }
         
-        .kwitansi-header { text-align: center; border-bottom: 2px double black; padding-bottom: 10px; margin-bottom: 20px; }
-        .kwitansi-title { font-size: 16pt; font-weight: bold; text-decoration: underline; text-transform: uppercase; }
-        .kwitansi-no { font-size: 11pt; margin-top: 5px; }
+        .kwitansi-header { text-align: center; border-bottom: 2px double black; padding-bottom: 5px; margin-bottom: 10px; }
+        .kwitansi-title { font-size: 14pt; font-weight: bold; text-decoration: underline; text-transform: uppercase; }
+        .kwitansi-no { font-size: 10pt; margin-top: 2px; }
         
-        .kwitansi-body { font-size: 11pt; line-height: 1.6; }
-        .kwitansi-row { display: flex; margin-bottom: 5px; }
-        .kw-label { width: 140px; flex-shrink: 0; }
-        .kw-value { flex-grow: 1; border-bottom: 1px dotted black; font-weight: bold; }
-        .kw-terbilang { font-style: italic; margin-bottom: 15px; }
+        .kwitansi-body { font-size: 9pt; line-height: 1.4; } /* Font disesuaikan agar muat di landscape yang lebih pendah */
+        
+        .kwitansi-row { display: flex; margin-bottom: 3px; align-items: center; }
+        .kw-label { width: 100px; flex-shrink: 0; font-size: 9pt; }
+        .kw-value { flex-grow: 1; border-bottom: 1px dotted black; font-weight: bold; font-size: 9pt; min-height: 14px;}
+        .kw-terbilang { font-style: italic; margin-bottom: 8px; font-size: 9pt; }
 
-        .kw-table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 20px; }
-        .kw-table th, .kw-table td { border: 1px solid black; padding: 5px; text-align: left; font-size: 10pt; }
+        .kw-table { width: 100%; border-collapse: collapse; margin-top: 5px; margin-bottom: 10px; }
+        .kw-table th, .kw-table td { border: 1px solid black; padding: 3px; text-align: left; font-size: 8pt; }
         .kw-table th { background-color: #eee; text-align: center; }
-        .kw-table td:nth-child(2), .kw-table td:nth-child(3) { text-align: right; }
+        .kw-table td:nth-child(2), .kw-table td:nth-child(3), .kw-table td:nth-child(4) { text-align: right; }
         
-        .kw-total-row td { font-weight: bold; }
-        .kw-footer { display: flex; justify-content: space-between; margin-top: 30px; page-break-inside: avoid; }
-        .kw-signature { text-align: center; width: 150px; }
-        .kw-signature-space { height: 60px; }
-        .kw-date-place { margin-top: 60px; text-align: center; }
+        .kw-total-row td { font-weight: bold; background-color: #f9f9f9; }
+        
+        .kw-footer { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-top: 5px; 
+            page-break-inside: avoid; 
+        }
+        .kw-signature { text-align: center; width: 120px; }
+        .kw-signature-space { height: 35px; } /* Kurangi tinggi space tanda tangan */
+        .kw-date-place { font-size: 8pt; margin-bottom: 5px; }
 
     </style>
 </head>
@@ -208,7 +222,7 @@
 
     <!-- Sidebar -->
     <aside>
-        <h1>Keuangan OPD <br><small style="font-size:0.7em; color:#666">(Live G-Sheet)</small></h1>
+        <h1>Keuangan OPD <br><small style="font-size:0.7em; color:#666">(A6 Landscape)</small></h1>
         <nav>
             <button id="nav-entry" class="active" onclick="switchTab('entry')">📝 Entri Transaksi</button>
             <button id="nav-report" onclick="switchTab('report')">📊 Laporan Data (Sheet)</button>
@@ -349,7 +363,7 @@
     <div class="modal-overlay" id="printModal">
         <div class="modal-content">
             <span class="close-modal" onclick="closePrintModal()">&times;</span>
-            <h2 style="margin-bottom: 1rem;">Preview Kwitansi (A6)</h2>
+            <h2 style="margin-bottom: 1rem;">Preview Kwitansi (A6 Landscape)</h2>
             
             <div class="a6-preview" id="a6PreviewContent">
                 <!-- Content injected via JS -->
@@ -364,7 +378,7 @@
 
     <!-- ACTUAL PRINT AREA -->
     <div id="print-area">
-        <div class="a6-preview" style="border: none; margin: 0; box-shadow: none; padding: 10mm;">
+        <div class="a6-preview" style="border: none; margin: 0; box-shadow: none; padding: 8mm;">
             <div id="printContentTarget"></div>
         </div>
     </div>
@@ -378,21 +392,17 @@
         // ==========================================================
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2dLrH58ZrnlI1dH2fDTOJDhFYQWytg_wbSTvah25q-F429yUXqJce_W-eD1Iv0NEW6A/exec"; 
         
-        // Jika URL belum diisi, beri peringatan
         if(GOOGLE_SCRIPT_URL.includes("PASTE")) {
-            alert("PERINGATAN: Anda belum memasukkan URL Google Script di dalam kode HTML! \nBuka file ini di text editor dan cari 'GOOGLE_SCRIPT_URL'.");
+            alert("PERINGATAN: Anda belum memasukkan URL Google Script di dalam kode HTML!");
         }
 
         const RATES = { g1: 2000, g2: 5000, g3: 7000, g4: 10000 };
-        let transactions = []; // Cache data dari sheet
+        let transactions = [];
 
-        // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('printDate').value = today;
             document.getElementById('depositDate').value = today;
-            
-            // Saat load, kita coba ambil nomor kwitansi terakhir dari sheet
             fetchLastReceiptNumber();
         });
 
@@ -400,20 +410,15 @@
             document.getElementById('loading').style.display = show ? 'flex' : 'none';
         }
 
-        // --- NAVIGATION ---
         function switchTab(tabName) {
             document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
-            
             document.getElementById(`section-${tabName}`).classList.add('active');
             document.getElementById(`nav-${tabName}`).classList.add('active');
-
             if(tabName === 'report') fetchDataFromSheet();
         }
 
-        // --- FETCH DATA FROM SHEET (GET) ---
         function fetchLastReceiptNumber() {
-            // Kita ambil data hanya untuk menentukan nomor urut terakhir
             fetch(GOOGLE_SCRIPT_URL)
                 .then(res => res.json())
                 .then(data => {
@@ -422,7 +427,6 @@
                 })
                 .catch(err => {
                     console.error("Gagal ambil nomor urut", err);
-                    // Fallback ke local jika error
                     updateReceiptNumberDisplay([]); 
                 });
         }
@@ -443,7 +447,6 @@
                 });
         }
 
-        // --- CALCULATIONS ---
         function calculateTotal() {
             const q1 = parseInt(document.getElementById('qtyG1').value) || 0;
             const q2 = parseInt(document.getElementById('qtyG2').value) || 0;
@@ -469,48 +472,31 @@
             return { total, fiftyPercent, q1, q2, q3, q4, s1, s2, s3, s4 };
         }
 
-        // --- RECEIPT NUMBER LOGIC (Synced with Sheet Data) ---
         function updateReceiptNumberDisplay(dataList) {
             const now = new Date();
             const currentMonthYear = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-            
-            // Cari data terakhir yang bulannya sama
             let lastSeq = 0;
             if(dataList && dataList.length > 0) {
-                // Asumsi dataList sudah di-sort reverse (terbaru di atas) oleh Apps Script
-                // Cari item pertama yang bulannya cocok
-                const lastTxSameMonth = dataList.find(tx => {
-                    // tx.printDate format YYYY-MM-DD
-                    return tx.printDate.startsWith(currentMonthYear);
-                });
-
+                const lastTxSameMonth = dataList.find(tx => tx.printDate.startsWith(currentMonthYear));
                 if(lastTxSameMonth) {
-                    // Parsing nomor dari string "KWITANSI/001/X/2023"
                     const parts = lastTxSameMonth.receiptNo.split('/');
-                    if(parts.length >= 2) {
-                        lastSeq = parseInt(parts[1]);
-                    }
+                    if(parts.length >= 2) lastSeq = parseInt(parts[1]);
                 }
             }
-            
             const nextSeq = lastSeq + 1;
             const roman = toRoman(now.getMonth() + 1);
             const formattedSeq = String(nextSeq).padStart(3, '0');
             document.getElementById('receiptNo').value = `KWITANSI/${formattedSeq}/${roman}/${now.getFullYear()}`;
         }
 
-        // --- FORM SUBMISSION (POST to Sheet) ---
         document.getElementById('transactionForm').addEventListener('submit', function(e) {
             e.preventDefault();
-
             const calcs = calculateTotal();
             if (calcs.total === 0) {
                 showToast("Total pembayaran tidak boleh Rp 0", "error");
                 return;
             }
-
             const receiptNo = document.getElementById('receiptNo').value;
-            
             const formData = {
                 receiptNo: receiptNo,
                 printDate: document.getElementById('printDate').value,
@@ -521,10 +507,7 @@
                 totalBayar: calcs.total,
                 bayar50: calcs.fiftyPercent
             };
-
             showLoading(true);
-
-            // Mengirim data ke Google Script
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 body: JSON.stringify(formData)
@@ -534,9 +517,7 @@
                 showLoading(false);
                 if(response.status === 'success') {
                     showToast("Data tersimpan di Spreadsheet!");
-                    // Tampilkan Preview Cetak
                     showPrintPreview(formData);
-                    // Refresh data lokal dan reset form
                     fetchLastReceiptNumber(); 
                     resetForm();
                 } else {
@@ -557,27 +538,22 @@
             document.getElementById('qtyG2').value = 0;
             document.getElementById('qtyG3').value = 0;
             document.getElementById('qtyG4').value = 0;
-            
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('printDate').value = today;
             document.getElementById('depositDate').value = today;
-            
-            fetchLastReceiptNumber(); // Reset nomor ke yang terbaru
+            fetchLastReceiptNumber(); 
             calculateTotal();
         }
 
-        // --- REPORTING ---
         function renderReport() {
             const tbody = document.getElementById('reportTableBody');
             const emptyState = document.getElementById('emptyState');
             tbody.innerHTML = '';
-
             if (transactions.length === 0) {
                 emptyState.style.display = 'block';
                 return;
             }
             emptyState.style.display = 'none';
-
             transactions.forEach(tx => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -598,7 +574,6 @@
             });
         }
 
-        // --- PRINTING & PREVIEW ---
         function showPrintPreview(data) {
             const html = generateReceiptHTML(data);
             document.getElementById('a6PreviewContent').innerHTML = html;
@@ -606,7 +581,6 @@
             document.getElementById('printModal').classList.add('open');
         }
 
-        // Menerima object stringified dari HTML attribute onclick
         window.reprintTx = function(dataObj) {
             showPrintPreview(dataObj);
         }
@@ -638,9 +612,9 @@
                     <table class="kw-table">
                         <thead>
                             <tr>
-                                <th>Ket</th>
-                                <th style="width: 50px;">Jml</th>
-                                <th style="width: 80px;">Nominal</th>
+                                <th style="width: 25%">Ket</th>
+                                <th style="width: 15%">Jml</th>
+                                <th style="width: 20%">Nominal</th>
                                 <th>Jumlah</th>
                             </tr>
                         </thead>
@@ -654,13 +628,13 @@
                                 <td align="right">${formatRupiah(data.totalBayar)}</td>
                             </tr>
                              <tr>
-                                <td colspan="3" align="center" style="font-size:9pt">Bayar 50%</td>
-                                <td align="right" style="font-size:9pt">${formatRupiah(data.bayar50)}</td>
+                                <td colspan="3" align="center" style="font-size:7pt">Bayar 50%</td>
+                                <td align="right" style="font-size:7pt">${formatRupiah(data.bayar50)}</td>
                             </tr>
                         </tbody>
                     </table>
                     
-                    <div style="margin-top: 10px; font-size: 10pt;">
+                    <div style="margin-top: 5px; font-size: 8pt;">
                         Tanggal Setor: ${formatDate(data.depositDate)}<br>
                         OPD: ${data.opd}
                     </div>
@@ -669,10 +643,10 @@
                 <div class="kw-footer">
                     <div class="kw-signature">
                         <div class="kw-date-place">${formatDate(data.printDate)}</div>
-                        <div>Bendahara Penerima</div>
+                        <div>Bendahara</div>
                         <div class="kw-signature-space"></div>
                         <div style="text-decoration: underline; font-weight: bold;">Nama Petugas</div>
-                        <div>NIP. ............................</div>
+                        <div style="font-size: 7pt;">NIP. ............................</div>
                     </div>
                      <div class="kw-signature">
                         <div>&nbsp;</div>
@@ -684,7 +658,6 @@
             `;
         }
 
-        // --- UTILITIES ---
         function formatRupiah(num) {
             return "Rp " + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
