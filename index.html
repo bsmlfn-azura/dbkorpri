@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Kwitansi 21x9cm + Kop Instansi</title>
+    <title>Sistem Kwitansi Layout 3 Kolom Vertikal</title>
     <style>
         :root {
             --primary-color: #2563eb;
@@ -12,8 +12,6 @@
             --surface-color: #ffffff;
             --text-color: #1f2937;
             --border-color: #e5e7eb;
-            --success-color: #10b981;
-            --danger-color: #ef4444;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -29,264 +27,182 @@
             flex-direction: column;
             padding: 1rem;
         }
-
-        aside h1 { font-size: 1.2rem; margin-bottom: 2rem; color: var(--primary-color); font-weight: bold; }
-
-        nav button {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 8px;
-            text-align: left;
-            background: none;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1rem;
-            color: var(--text-color);
-            transition: all 0.2s;
-        }
-
+        aside h1 { font-size: 1.1rem; margin-bottom: 2rem; color: var(--primary-color); font-weight: bold; line-height: 1.3; }
+        nav button { width: 100%; padding: 12px; margin-bottom: 8px; text-align: left; background: none; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; color: var(--text-color); transition: all 0.2s; }
         nav button:hover { background-color: var(--bg-color); }
         nav button.active { background-color: var(--primary-color); color: white; font-weight: 600; }
 
         /* Main Content */
         main { flex: 1; padding: 2rem; overflow-y: auto; position: relative; }
-        
         .section { display: none; }
         .section.active { display: block; }
-
-        .card {
-            background: var(--surface-color);
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
-        }
-
+        .card { background: var(--surface-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
         .card h2 { margin-bottom: 1.5rem; font-size: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
 
-        /* Form Grid */
+        /* Form Styles */
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
-        
         .form-group { margin-bottom: 1rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 500; }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 0.6rem;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 1rem;
-        }
+        .form-group input, .form-group select { width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem; }
         .form-group input[readonly] { background-color: #e5e7eb; cursor: not-allowed; }
 
-        /* Table Inputs for Golongan */
+        /* Buttons */
+        .btn { padding: 0.6rem 1.2rem; border: none; border-radius: 4px; cursor: pointer; font-size: 0.95rem; font-weight: 500; transition: background 0.2s; }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: var(--secondary-color); }
+        .btn-secondary { background-color: #6b7280; color: white; }
+
+        /* Data Table */
         .golongan-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
         .golongan-table th, .golongan-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border-color); }
         .golongan-table th { background-color: #f9fafb; font-weight: 600; }
         .golongan-table input { width: 100px; padding: 0.4rem; border: 1px solid var(--border-color); border-radius: 4px; text-align: right; }
-        .golongan-table .fixed-nominal { background-color: #f3f4f6; padding: 0.4rem; border-radius: 4px; text-align: right; display: inline-block; width: 100px;}
-
-        /* Buttons */
-        .btn {
-            padding: 0.6rem 1.2rem;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-        .btn-primary { background-color: var(--primary-color); color: white; }
-        .btn-primary:hover { background-color: var(--secondary-color); }
-        .btn-secondary { background-color: #6b7280; color: white; }
+        .fixed-nominal { background-color: #f3f4f6; padding: 0.4rem; border-radius: 4px; text-align: right; display: inline-block; width: 100px;}
         
-        /* Data Report Table */
+        /* Report Table */
         .data-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
         .data-table th, .data-table td { padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); font-size: 0.9rem; }
         .data-table th { background-color: #f9fafb; position: sticky; top: 0; }
         .data-table tr:nth-child(even) { background-color: #f9fafb; }
         .action-cell { display: flex; gap: 0.5rem; }
-        
-        /* Loading Overlay */
-        .loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.8);
-            display: none; justify-content: center; align-items: center; z-index: 3000;
-            flex-direction: column;
-        }
-        .spinner {
-            border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color);
-            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
-            margin-bottom: 10px;
-        }
+
+        /* Modal & Loading */
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 3000; flex-direction: column; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Modal for Print Preview */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none; justify-content: center; align-items: center; z-index: 1000;
-        }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-overlay.open { display: flex; }
-        
-        .modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            max-width: 900px;
-            width: 95%;
-            max-height: 95vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
+        .modal-content { background: white; padding: 2rem; border-radius: 8px; max-width: 900px; width: 95%; max-height: 95vh; overflow-y: auto; position: relative; }
         .close-modal { position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem; }
-        
         .modal-actions { margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end; }
 
-        /* Toast Notification */
-        .toast {
-            position: fixed; bottom: 20px; right: 20px;
-            background: #333; color: white; padding: 12px 24px;
-            border-radius: 4px; opacity: 0; transition: opacity 0.3s;
-            pointer-events: none; z-index: 2000;
-        }
+        /* Toast */
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 12px 24px; border-radius: 4px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 2000; }
         .toast.show { opacity: 1; }
 
-        /* --- PRINT STYLES (21cm x 9cm) --- */
+        /* ========================================= */
+        /*            PRINT STYLES (21x9)            */
+        /* ========================================= */
         #print-area { display: none; }
-
         @media print {
             body * { visibility: hidden; }
             #print-area, #print-area * { visibility: visible; }
-            #print-area {
-                display: block;
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
-            @page { 
-                size: 21cm 9cm portrait; 
-                margin: 0; 
-            }
+            #print-area { display: block; position: absolute; left: 0; top: 0; width: 100%; }
+            @page { size: 21cm 9cm portrait; margin: 0; }
         }
 
-        /* Screen preview of 21cm x 9cm */
         .receipt-preview {
             width: 21cm;
             height: 9cm;
-            padding: 5mm;
+            padding: 4mm;
             border: 1px dashed #ccc;
             margin: 0 auto;
             background: white;
-            font-family: 'Arial Narrow', Arial, sans-serif; 
+            font-family: 'Arial Narrow', Arial, sans-serif;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             overflow: hidden;
-            display: flex;
-            flex-direction: column; /* Kolom Vertikal: Header di atas, Body di bawah */
+            display: flex;         /* Main Vertical Flex Container */
+            flex-direction: column; /* Kolom Vertikal: Atas, Tengah, Bawah */
             box-sizing: border-box;
+            gap: 2px; /* Jarak antar kolom vertikal */
         }
 
-        /* --- 1. BAGIAN KOP INSTANSI (Header) --- */
-        .letterhead {
-            text-align: center;
-            border-bottom: 3px double black; /* Garis ganda tebal */
-            padding-bottom: 3px;
-            margin-bottom: 5px;
-            position: relative;
+        /* --- 1. KOLOM ATAS: KOP & NOMOR --- */
+        .col-top {
+            flex: 0 0 auto; /* Jangan membesar/mengecil, sesuai konten */
+            border-bottom: 2px double black;
+            padding-bottom: 2px;
+            margin-bottom: 2px;
+        }
+        .kop-container { text-align: center; margin-bottom: 2px; }
+        .kop-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 1px; }
+        .kop-logo { width: 28px; height: 28px; background: #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 7pt; font-weight: bold; }
+        .kop-text h2 { font-size: 9pt; font-weight: 900; text-transform: uppercase; margin: 0; line-height: 1.1; }
+        .kop-text h3 { font-size: 8pt; font-weight: 700; text-transform: uppercase; margin: 0; line-height: 1.1; }
+        .kop-addr { font-size: 6.5pt; margin: 0; font-style: italic; }
+        .kw-title-row { text-align: center; }
+        .kw-title { font-size: 10pt; font-weight: bold; text-decoration: underline; text-transform: uppercase; }
+        .kw-no { font-size: 7.5pt; }
+
+        /* --- 2. KOLOM TENGAH: DATA & TOTAL --- */
+        .col-mid {
+            flex: 1; /* Mengisi sisa ruang vertikal */
+            display: flex; /* Flex Horizontal untuk bagi kiri/kanan */
+            flex-direction: row;
+            gap: 5px;
+            overflow: hidden; /* Supaya tidak keluar */
         }
 
-        .lh-row-1 { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 2px; }
-        .lh-logo { 
-            width: 35px; height: 35px; 
-            background-color: #ddd; 
-            border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center;
-            font-size: 8pt; font-weight: bold; color: #555;
-        }
-        .lh-text h2 { font-size: 10pt; font-weight: 900; text-transform: uppercase; margin: 0; line-height: 1.1; }
-        .lh-text h3 { font-size: 9pt; font-weight: 700; text-transform: uppercase; margin: 0; line-height: 1.1; }
-        .lh-address { font-size: 7pt; margin: 0; font-style: italic; }
-
-        .kwitansi-title-block {
-            margin-top: 2px;
-        }
-        .kw-title { font-size: 11pt; font-weight: bold; text-decoration: underline; text-transform: uppercase; }
-        .kw-no { font-size: 8pt; margin-top: 1px; }
-
-        /* --- 2. BAGIAN ISI (Body 3 Kolom) --- */
-        .content-columns {
+        /* Kiri: Data-Data */
+        .mid-left {
+            flex: 2; /* Lebar 2 bagian */
             display: flex;
-            flex: 1; /* Mengisi sisa tinggi kertas */
-            overflow: hidden;
+            flex-direction: column;
+            gap: 1px;
+            font-size: 7.5pt;
         }
+        .data-row { display: flex; gap: 5px; margin-bottom: 1px; }
+        .data-label { width: 90px; flex-shrink: 0; font-weight: bold; }
+        .data-value { flex-grow: 1; border-bottom: 1px dotted #ccc; min-height: 12px; }
         
-        .col-left { width: 26%; border-right: 1px solid #ddd; padding-right: 5px; }
-        .col-mid { width: 44%; border-right: 1px solid #ddd; padding: 0 5px; }
-        .col-right { width: 30%; padding-left: 5px; display: flex; flex-direction: column; justify-content: flex-end; }
-
-        /* Typography Body */
-        .kw-body { font-size: 8pt; line-height: 1.1; }
+        /* Tabel Golongan Sangat Padat */
+        .compact-table { width: 100%; border-collapse: collapse; font-size: 7pt; margin-top: 2px; }
+        .compact-table th, .compact-table td { border: 1px solid black; padding: 0px 2px; text-align: center; }
+        .compact-table td:first-child { text-align: left; }
+        .compact-table td:nth-last-child(2), .compact-table td:last-child { text-align: right; }
+        .compact-table th { background: #eee; }
         
-        .row-label { font-size: 7pt; color: #555; margin-bottom: 1px; }
-        .row-value { font-size: 8pt; font-weight: bold; margin-bottom: 3px; border-bottom: 1px dotted #ccc; min-height: 11px;}
+        .terbilang-box { font-style: italic; font-size: 7pt; background: #f9f9f9; padding: 2px; border: 1px solid #eee; margin-top: 2px;}
 
-        .terbilang-box { 
-            font-style: italic; font-size: 7pt; 
-            margin: 3px 0; padding: 2px; 
-            background: #f9f9f9; border: 1px solid #eee;
+        /* Kanan: Total Bayar */
+        .mid-right {
+            flex: 1; /* Lebar 1 bagian */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Taruh ke bawah */
+            gap: 5px;
         }
-
-        /* Table Custom */
-        .kw-table { width: 100%; border-collapse: collapse; font-size: 7.5pt; margin-top: 2px; }
-        .kw-table th, .kw-table td { border: 1px solid black; padding: 0px 2px; }
-        .kw-table th { background-color: #eee; text-align: center; font-size: 6.5pt; }
-        .kw-table td:nth-child(2) { text-align: center; } 
-        .kw-table td:nth-child(3) { text-align: right; } 
-        .kw-table td:nth-child(4) { text-align: right; } 
-        .kw-total td { font-weight: bold; background: #f0f0f0; }
-
-        /* Signature */
-        .sig-box { text-align: center; margin-bottom: 5px; }
-        .sig-name { text-decoration: underline; font-weight: bold; font-size: 7.5pt; margin-top: 3px; display: block;}
-        .sig-space { height: 20px; }
-        .sig-date { font-size: 6.5pt; margin-bottom: 1px; }
-
-        /* Total Box di Kanan */
         .total-box {
-            background: #eee;
             border: 1px solid black;
-            padding: 3px;
-            margin-bottom: auto;
+            padding: 4px;
+            background: #fdfdfd;
             text-align: right;
         }
-        .total-label { font-size: 7pt; font-weight: bold; }
-        .total-amount { font-size: 9pt; font-weight: bold; color: #000; }
+        .total-label { font-size: 7pt; font-weight: bold; display: block; }
+        .total-amount { font-size: 10pt; font-weight: 900; color: #000; }
+        .total-amount.sub { font-size: 9pt; font-weight: bold; color: #444; }
+
+        /* --- 3. KOLOM BAWAH: TANDA TANGAN --- */
+        .col-bottom {
+            flex: 0 0 auto; /* Tinggi otomatis */
+            display: flex; /* Flex Horizontal (Kiri-Kanan) */
+            justify-content: space-between;
+            margin-top: auto; /* Paksa ke paling bawah */
+            font-size: 7.5pt;
+        }
+        .sig-col { text-align: center; width: 45%; }
+        .sig-date { margin-bottom: 2px; }
+        .sig-title { margin-bottom: 2px; font-weight: bold; }
+        .sig-space { height: 25px; }
+        .sig-name { text-decoration: underline; font-weight: bold; display: block; margin-top: 2px;}
+        .sig-nip { font-size: 6pt; }
 
     </style>
 </head>
 <body>
 
-    <!-- Sidebar -->
     <aside>
-        <h1>Keuangan OPD <br><small style="font-size:0.7em; color:#666">(Kop Instansi)</small></h1>
+        <h1>Keuangan OPD <br><small style="font-size:0.7em; color:#666">(Layout 3 Kolom Vertikal)</small></h1>
         <nav>
             <button id="nav-entry" class="active" onclick="switchTab('entry')">📝 Entri Transaksi</button>
             <button id="nav-report" onclick="switchTab('report')">📊 Laporan Data (Sheet)</button>
         </nav>
-        <div style="margin-top: auto; font-size: 0.8rem; color: #666;">
-            <p>Penyimpanan: Google Sheets</p>
-        </div>
     </aside>
 
-    <!-- Main Content -->
     <main>
-        <!-- Loading Overlay -->
-        <div id="loading" class="loading-overlay">
-            <div class="spinner"></div>
-            <p>Menghubungkan ke Google Spreadsheet...</p>
-        </div>
+        <!-- Loading -->
+        <div id="loading" class="loading-overlay"><div class="spinner"></div><p>Memuat...</p></div>
 
         <!-- ENTRY SECTION -->
         <section id="section-entry" class="section active">
@@ -294,81 +210,31 @@
                 <h2>Form Transaksi Baru</h2>
                 <form id="transactionForm">
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label>No. Kwitansi (Otomatis)</label>
-                            <input type="text" id="receiptNo" readonly placeholder="Mengambil data dari Sheet...">
-                        </div>
-                        <div class="form-group">
-                            <label>Tanggal Cetak</label>
-                            <input type="date" id="printDate" required>
-                        </div>
+                        <div class="form-group"><label>No. Kwitansi</label><input type="text" id="receiptNo" readonly></div>
+                        <div class="form-group"><label>Tanggal Cetak</label><input type="date" id="printDate" required></div>
                     </div>
-
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label>Nama Penyetor</label>
-                            <input type="text" id="depositorName" placeholder="Nama lengkap penyetor" required>
-                        </div>
-                        <div class="form-group">
-                            <label>OPD / Unit Kerja</label>
-                            <input type="text" id="opdName" placeholder="Nama Dinas/Instansi" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Tanggal Setor</label>
-                            <input type="date" id="depositDate" required>
-                        </div>
+                        <div class="form-group"><label>Nama Penyetor</label><input type="text" id="depositorName" required></div>
+                        <div class="form-group"><label>OPD / Unit Kerja</label><input type="text" id="opdName" required></div>
+                        <div class="form-group"><label>Tanggal Setor</label><input type="date" id="depositDate" required></div>
                     </div>
-
-                    <h3>Rincian Nominal & Golongan</h3>
+                    <h3>Rincian Nominal</h3>
                     <table class="golongan-table">
-                        <thead>
-                            <tr>
-                                <th>Golongan</th>
-                                <th>Nominal (Paten)</th>
-                                <th>Jumlah Orang</th>
-                                <th>Subtotal</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Golongan</th><th>Nominal</th><th>Jml</th><th>Subtotal</th></tr></thead>
                         <tbody>
-                            <tr>
-                                <td>Golongan 1</td>
-                                <td><div class="fixed-nominal">Rp 2.000</div></td>
-                                <td><input type="number" id="qtyG1" min="0" value="0" oninput="calculateTotal()"></td>
-                                <td id="subG1" style="text-align: right;">Rp 0</td>
-                            </tr>
-                            <tr>
-                                <td>Golongan 2</td>
-                                <td><div class="fixed-nominal">Rp 5.000</div></td>
-                                <td><input type="number" id="qtyG2" min="0" value="0" oninput="calculateTotal()"></td>
-                                <td id="subG2" style="text-align: right;">Rp 0</td>
-                            </tr>
-                            <tr>
-                                <td>Golongan 3</td>
-                                <td><div class="fixed-nominal">Rp 7.000</div></td>
-                                <td><input type="number" id="qtyG3" min="0" value="0" oninput="calculateTotal()"></td>
-                                <td id="subG3" style="text-align: right;">Rp 0</td>
-                            </tr>
-                            <tr>
-                                <td>Golongan 4</td>
-                                <td><div class="fixed-nominal">Rp 10.000</div></td>
-                                <td><input type="number" id="qtyG4" min="0" value="0" oninput="calculateTotal()"></td>
-                                <td id="subG4" style="text-align: right;">Rp 0</td>
-                            </tr>
+                            <tr><td>Gol 1</td><td><div class="fixed-nominal">Rp 2.000</div></td><td><input type="number" id="qtyG1" min="0" value="0" oninput="calculateTotal()"></td><td id="subG1" style="text-align: right;">Rp 0</td></tr>
+                            <tr><td>Gol 2</td><td><div class="fixed-nominal">Rp 5.000</div></td><td><input type="number" id="qtyG2" min="0" value="0" oninput="calculateTotal()"></td><td id="subG2" style="text-align: right;">Rp 0</td></tr>
+                            <tr><td>Gol 3</td><td><div class="fixed-nominal">Rp 7.000</div></td><td><input type="number" id="qtyG3" min="0" value="0" oninput="calculateTotal()"></td><td id="subG3" style="text-align: right;">Rp 0</td></tr>
+                            <tr><td>Gol 4</td><td><div class="fixed-nominal">Rp 10.000</div></td><td><input type="number" id="qtyG4" min="0" value="0" oninput="calculateTotal()"></td><td id="subG4" style="text-align: right;">Rp 0</td></tr>
                         </tbody>
                     </table>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: #f0fdf4; padding: 1rem; border: 1px solid #bbf7d0; border-radius: 6px;">
-                        <div>
-                            <strong>Total Bayar:</strong> <span id="displayTotalBayar" style="font-size: 1.2rem;">Rp 0</span>
-                        </div>
-                        <div>
-                            <strong>Bayar 50%:</strong> <span id="displayBayar50" style="font-size: 1.2rem; color: var(--primary-color);">Rp 0</span>
-                        </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: #f0fdf4; padding: 1rem; border: 1px solid #bbf7d0; border-radius: 6px; margin-bottom: 1.5rem;">
+                        <div><strong>Total:</strong> <span id="displayTotalBayar" style="font-size: 1.2rem;">Rp 0</span></div>
+                        <div><strong>50%:</strong> <span id="displayBayar50" style="font-size: 1.2rem; color: var(--primary-color);">Rp 0</span></div>
                     </div>
-
-                    <div style="margin-top: 1.5rem; text-align: right;">
+                    <div style="text-align: right;">
                         <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
-                        <button type="submit" class="btn btn-primary">Simpan ke Sheet & Cetak</button>
+                        <button type="submit" class="btn btn-primary">Simpan & Cetak</button>
                     </div>
                 </form>
             </div>
@@ -378,72 +244,46 @@
         <section id="section-report" class="section">
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h2>Laporan Data (Live dari Spreadsheet)</h2>
-                    <button class="btn btn-secondary" onclick="fetchDataFromSheet()">🔄 Refresh Data</button>
+                    <h2>Laporan Data</h2>
+                    <button class="btn btn-secondary" onclick="fetchDataFromSheet()">🔄 Refresh</button>
                 </div>
                 <div style="overflow-x: auto;">
                     <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>No. Kwitansi</th>
-                                <th>Tgl Cetak</th>
-                                <th>Penyetor</th>
-                                <th>OPD</th>
-                                <th>Tgl Setor</th>
-                                <th>Total Bayar</th>
-                                <th>Bayar 50%</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reportTableBody">
-                            <!-- Data will be populated here -->
-                        </tbody>
+                        <thead><tr><th>No Kwitansi</th><th>Tgl Cetak</th><th>Penyetor</th><th>OPD</th><th>Total</th><th>50%</th><th>Aksi</th></tr></thead>
+                        <tbody id="reportTableBody"></tbody>
                     </table>
                 </div>
-                <div id="emptyState" style="text-align: center; padding: 2rem; color: #6b7280; display: none;">
-                    Belum ada data transaksi.
-                </div>
+                <div id="emptyState" style="text-align: center; padding: 2rem; color: #6b7280; display: none;">Belum ada data.</div>
             </div>
         </section>
     </main>
 
-    <!-- PRINT MODAL PREVIEW -->
+    <!-- MODAL PREVIEW -->
     <div class="modal-overlay" id="printModal">
         <div class="modal-content">
             <span class="close-modal" onclick="closePrintModal()">&times;</span>
-            <h2 style="margin-bottom: 1rem; text-align: center;">Preview Kwitansi (21x9 cm + Kop)</h2>
-            
-            <div class="receipt-preview" id="a6PreviewContent">
-                <!-- Content injected via JS -->
-            </div>
-
+            <h2 style="margin-bottom: 1rem; text-align: center;">Preview Kwitansi (21x9)</h2>
+            <div class="receipt-preview" id="a6PreviewContent"></div>
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="closePrintModal()">Tutup</button>
-                <button class="btn btn-primary" onclick="window.print()">🖨 Cetak ke PDF / Printer</button>
+                <button class="btn btn-primary" onclick="window.print()">🖨 Cetak</button>
             </div>
         </div>
     </div>
 
-    <!-- ACTUAL PRINT AREA -->
+    <!-- PRINT AREA -->
     <div id="print-area">
         <div class="receipt-preview" style="border: none; margin: 0; box-shadow: none;">
             <div id="printContentTarget"></div>
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION -->
     <div id="toast" class="toast">Pesan notifikasi</div>
 
     <script>
-        // ==========================================================
-        // KONFIGURASI PENTING: GANTI DENGAN URL WEB APP ANDA
-        // ==========================================================
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2dLrH58ZrnlI1dH2fDTOJDhFYQWytg_wbSTvah25q-F429yUXqJce_W-eD1Iv0NEW6A/exec"; 
+        if(GOOGLE_SCRIPT_URL.includes("PASTE")) alert("Masukkan URL Google Script!");
         
-        if(GOOGLE_SCRIPT_URL.includes("PASTE")) {
-            alert("PERINGATAN: Anda belum memasukkan URL Google Script di dalam kode HTML!");
-        }
-
         const RATES = { g1: 2000, g2: 5000, g3: 7000, g4: 10000 };
         let transactions = [];
 
@@ -454,70 +294,30 @@
             fetchLastReceiptNumber();
         });
 
-        function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'flex' : 'none';
-        }
-
-        function switchTab(tabName) {
+        function switchTab(tab) {
             document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
-            document.getElementById(`section-${tabName}`).classList.add('active');
-            document.getElementById(`nav-${tabName}`).classList.add('active');
-            if(tabName === 'report') fetchDataFromSheet();
+            document.getElementById(`section-${tab}`).classList.add('active');
+            document.getElementById(`nav-${tab}`).classList.add('active');
+            if(tab === 'report') fetchDataFromSheet();
         }
 
-        function fetchLastReceiptNumber() {
-            fetch(GOOGLE_SCRIPT_URL)
-                .then(res => res.json())
-                .then(data => {
-                    transactions = data;
-                    updateReceiptNumberDisplay(transactions);
-                })
-                .catch(err => {
-                    console.error("Gagal ambil nomor urut", err);
-                    updateReceiptNumberDisplay([]); 
-                });
-        }
-
-        function fetchDataFromSheet() {
-            showLoading(true);
-            fetch(GOOGLE_SCRIPT_URL)
-                .then(res => res.json())
-                .then(data => {
-                    transactions = data;
-                    renderReport();
-                    showLoading(false);
-                })
-                .catch(err => {
-                    console.error(err);
-                    showToast("Gagal mengambil data dari Sheet", "error");
-                    showLoading(false);
-                });
-        }
+        function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
 
         function calculateTotal() {
             const q1 = parseInt(document.getElementById('qtyG1').value) || 0;
             const q2 = parseInt(document.getElementById('qtyG2').value) || 0;
             const q3 = parseInt(document.getElementById('qtyG3').value) || 0;
             const q4 = parseInt(document.getElementById('qtyG4').value) || 0;
-
-            const s1 = q1 * RATES.g1;
-            const s2 = q2 * RATES.g2;
-            const s3 = q3 * RATES.g3;
-            const s4 = q4 * RATES.g4;
-
+            const s1 = q1 * RATES.g1, s2 = q2 * RATES.g2, s3 = q3 * RATES.g3, s4 = q4 * RATES.g4;
             document.getElementById('subG1').textContent = formatRupiah(s1);
             document.getElementById('subG2').textContent = formatRupiah(s2);
             document.getElementById('subG3').textContent = formatRupiah(s3);
             document.getElementById('subG4').textContent = formatRupiah(s4);
-
             const total = s1 + s2 + s3 + s4;
-            const fiftyPercent = total / 2;
-
             document.getElementById('displayTotalBayar').textContent = formatRupiah(total);
-            document.getElementById('displayBayar50').textContent = formatRupiah(fiftyPercent);
-
-            return { total, fiftyPercent, q1, q2, q3, q4, s1, s2, s3, s4 };
+            document.getElementById('displayBayar50').textContent = formatRupiah(total / 2);
+            return { total, fiftyPercent: total / 2, q1, q2, q3, q4, s1, s2, s3, s4 };
         }
 
         function updateReceiptNumberDisplay(dataList) {
@@ -533,91 +333,69 @@
             }
             const nextSeq = lastSeq + 1;
             const roman = toRoman(now.getMonth() + 1);
-            const formattedSeq = String(nextSeq).padStart(3, '0');
-            document.getElementById('receiptNo').value = `KWITANSI/${formattedSeq}/${roman}/${now.getFullYear()}`;
+            document.getElementById('receiptNo').value = `KWITANSI/${String(nextSeq).padStart(3, '0')}/${roman}/${now.getFullYear()}`;
+        }
+
+        function fetchLastReceiptNumber() {
+            fetch(GOOGLE_SCRIPT_URL).then(r=>r.json()).then(data => { transactions = data; updateReceiptNumberDisplay(transactions); }).catch(e=>console.log(e));
+        }
+
+        function fetchDataFromSheet() {
+            showLoading(true);
+            fetch(GOOGLE_SCRIPT_URL).then(r=>r.json()).then(data => {
+                transactions = data;
+                renderReport();
+                showLoading(false);
+            }).catch(e=>{ showToast("Gagal ambil data", "error"); showLoading(false); });
         }
 
         document.getElementById('transactionForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const calcs = calculateTotal();
-            if (calcs.total === 0) {
-                showToast("Total pembayaran tidak boleh Rp 0", "error");
-                return;
-            }
+            if (calcs.total === 0) return showToast("Total tidak boleh 0", "error");
+            
             const receiptNo = document.getElementById('receiptNo').value;
             const formData = {
-                receiptNo: receiptNo,
-                printDate: document.getElementById('printDate').value,
+                receiptNo, printDate: document.getElementById('printDate').value,
                 depositor: document.getElementById('depositorName').value,
                 opd: document.getElementById('opdName').value,
                 depositDate: document.getElementById('depositDate').value,
-                details: calcs,
-                totalBayar: calcs.total,
-                bayar50: calcs.fiftyPercent
+                details: calcs, totalBayar: calcs.total, bayar50: calcs.fiftyPercent
             };
+
             showLoading(true);
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(formData)
-            })
-            .then(res => res.json())
-            .then(response => {
-                showLoading(false);
-                if(response.status === 'success') {
-                    showToast("Data tersimpan di Spreadsheet!");
-                    showPrintPreview(formData);
-                    fetchLastReceiptNumber(); 
-                    resetForm();
-                } else {
-                    showToast("Gagal menyimpan: " + response.message, "error");
-                }
-            })
-            .catch(err => {
-                showLoading(false);
-                console.error(err);
-                showToast("Terjadi kesalahan koneksi ke Google", "error");
-            });
+            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(formData) })
+                .then(r=>r.json()).then(res => {
+                    showLoading(false);
+                    if(res.status === 'success') {
+                        showToast("Tersimpan!");
+                        showPrintPreview(formData);
+                        fetchLastReceiptNumber();
+                        resetForm();
+                    } else { showToast("Gagal: " + res.message, "error"); }
+                }).catch(err => { showLoading(false); showToast("Error koneksi", "error"); });
         });
 
         function resetForm() {
             document.getElementById('depositorName').value = '';
             document.getElementById('opdName').value = '';
-            document.getElementById('qtyG1').value = 0;
-            document.getElementById('qtyG2').value = 0;
-            document.getElementById('qtyG3').value = 0;
-            document.getElementById('qtyG4').value = 0;
+            ['G1','G2','G3','G4'].forEach(g => document.getElementById('qty'+g).value = 0);
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('printDate').value = today;
             document.getElementById('depositDate').value = today;
-            fetchLastReceiptNumber(); 
+            fetchLastReceiptNumber();
             calculateTotal();
         }
 
         function renderReport() {
             const tbody = document.getElementById('reportTableBody');
-            const emptyState = document.getElementById('emptyState');
             tbody.innerHTML = '';
-            if (transactions.length === 0) {
-                emptyState.style.display = 'block';
-                return;
-            }
-            emptyState.style.display = 'none';
+            if (transactions.length === 0) { document.getElementById('emptyState').style.display = 'block'; return; }
+            document.getElementById('emptyState').style.display = 'none';
             transactions.forEach(tx => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${tx.receiptNo}</td>
-                    <td>${formatDate(tx.printDate)}</td>
-                    <td>${tx.depositor}</td>
-                    <td>${tx.opd}</td>
-                    <td>${formatDate(tx.depositDate)}</td>
-                    <td>${formatRupiah(tx.totalBayar)}</td>
-                    <td>${formatRupiah(tx.bayar50)}</td>
-                    <td>
-                        <div class="action-cell">
-                            <button class="btn btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick='reprintTx(${JSON.stringify(tx)})'>Cetak</button>
-                        </div>
-                    </td>
-                `;
+                tr.innerHTML = `<td>${tx.receiptNo}</td><td>${formatDate(tx.printDate)}</td><td>${tx.depositor}</td><td>${tx.opd}</td><td>${formatRupiah(tx.totalBayar)}</td><td>${formatRupiah(tx.bayar50)}</td>
+                <td><button class="btn btn-primary" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick='reprintTx(${JSON.stringify(tx)})'>Cetak</button></td>`;
                 tbody.appendChild(tr);
             });
         }
@@ -629,179 +407,98 @@
             document.getElementById('printModal').classList.add('open');
         }
 
-        window.reprintTx = function(dataObj) {
-            showPrintPreview(dataObj);
-        }
-
-        function closePrintModal() {
-            document.getElementById('printModal').classList.remove('open');
-        }
+        window.reprintTx = function(dataObj) { showPrintPreview(dataObj); }
+        function closePrintModal() { document.getElementById('printModal').classList.remove('open'); }
 
         function generateReceiptHTML(data) {
             const d = data.details;
-            
-            // --- BAGIAN EDIT: SESUAIKAN NAMA INSTANSI DI SINI ---
-            const kopInstansi = `
-                <div class="letterhead">
-                    <div class="lh-row-1">
-                        <div class="lh-logo">LOGO</div>
-                        <div class="lh-text">
-                            <h2>PEMERINTAH KOTA BANDUNG</h2>
-                            <h3>DINAS KOMUNIKASI DAN INFORMATIKA</h3>
+            return `
+                <!-- KOLOM ATAS (Kop & Nomor) -->
+                <div class="col-top">
+                    <div class="kop-container">
+                        <div class="kop-row">
+                            <div class="kop-logo">LOGO</div>
+                            <div class="kop-text">
+                                <h2>PEMERINTAH KOTA [KOTA ANDA]</h2>
+                                <h3>DINAS [NAMA DINAS]</h3>
+                            </div>
+                            <div class="kop-logo" style="background:transparent; border:1px solid #ccc;">GARUDA</div>
                         </div>
-                        <div class="lh-logo" style="background:transparent; border:1px solid #ccc; font-size:6pt;">GARUDA</div>
+                        <p class="kop-addr">Jl. Alamat Kantor No. 1, Telp (022) 123456</p>
                     </div>
-                    <p class="lh-address">Jl. Wastu Kencana No. 1 Bandung 40111, Telp (022) 4235052</p>
-                    
-                    <div class="kwitansi-title-block">
+                    <div class="kw-title-row">
                         <div class="kw-title">KWITANSI</div>
                         <div class="kw-no">No: ${data.receiptNo}</div>
                     </div>
                 </div>
-            `;
-            // -----------------------------------------------------
 
-            return `
-                <!-- 1. KOP INSTANSI (FULL WIDTH) -->
-                ${kopInstansi}
-
-                <!-- 2. ISI DATA (3 KOLOM) -->
-                <div class="content-columns">
-                    
-                    <!-- KOLOM KIRI: INFO -->
-                    <div class="col-left">
-                        <div class="kw-body">
-                            <div class="row-label">Telah terima dari</div>
-                            <div class="row-value" style="text-transform: capitalize;">${data.depositor}</div>
-                            
-                            <div class="row-label">Untuk Pembayaran</div>
-                            <div class="row-value">${data.opd}</div>
-                            
-                            <div class="terbilang-box">
-                                "${terbilang(data.totalBayar)} Rupiah"
-                            </div>
-
-                            <div style="margin-top:3px; font-size: 7pt;">
-                                Tgl Setor: ${formatDate(data.depositDate)}
-                            </div>
+                <!-- KOLOM TENGAH (Split Horizontal) -->
+                <div class="col-mid">
+                    <!-- Kiri: Data-Data -->
+                    <div class="mid-left">
+                        <div class="data-row">
+                            <div class="data-label">Telah terima dari</div>
+                            <div class="data-value">${data.depositor}</div>
                         </div>
-                    </div>
-
-                    <!-- KOLOM TENGAH: TABEL -->
-                    <div class="col-mid">
-                        <div style="font-size: 7.5pt; font-weight: bold; text-align: center; margin-bottom: 2px; text-decoration: underline;">
-                            RINCIAN BIAYA
+                        <div class="data-row">
+                            <div class="data-label">Untuk Pembayaran</div>
+                            <div class="data-value">${data.opd}</div>
                         </div>
-                        <table class="kw-table">
-                            <thead>
-                                <tr>
-                                    <th>Ket</th>
-                                    <th>Jml</th>
-                                    <th>Hrg</th>
-                                    <th>Jumlah</th>
-                                </tr>
-                            </thead>
+                        <div class="data-row">
+                            <div class="data-label">Tgl. Setor</div>
+                            <div class="data-value">${formatDate(data.depositDate)}</div>
+                        </div>
+
+                        <!-- Tabel Golongan -->
+                        <table class="compact-table">
+                            <thead><tr><th>Ket</th><th>Jml</th><th>Nom</th><th>Total</th></tr></thead>
                             <tbody>
-                                <tr><td>Gol 1</td><td align="center">${d.q1}</td><td align="right">${RATES.g1}</td><td align="right">${d.s1}</td></tr>
-                                <tr><td>Gol 2</td><td align="center">${d.q2}</td><td align="right">${RATES.g2}</td><td align="right">${d.s2}</td></tr>
-                                <tr><td>Gol 3</td><td align="center">${d.q3}</td><td align="right">${RATES.g3}</td><td align="right">${d.s3}</td></tr>
-                                <tr><td>Gol 4</td><td align="center">${d.q4}</td><td align="right">${RATES.g4}</td><td align="right">${d.s4}</td></tr>
-                                <tr class="kw-total">
-                                    <td colspan="3" align="center">TOTAL</td>
-                                    <td align="right">${formatRupiah(data.totalBayar)}</td>
-                                </tr>
-                                <tr class="kw-total" style="background: #e0e0e0;">
-                                    <td colspan="3" align="center" style="font-size:6.5pt;">BAYAR 50%</td>
-                                    <td align="right" style="font-size:6.5pt;">${formatRupiah(data.bayar50)}</td>
-                                </tr>
+                                <tr><td>Gol 1</td><td>${d.q1}</td><td>${RATES.g1}</td><td>${d.s1}</td></tr>
+                                <tr><td>Gol 2</td><td>${d.q2}</td><td>${RATES.g2}</td><td>${d.s2}</td></tr>
+                                <tr><td>Gol 3</td><td>${d.q3}</td><td>${RATES.g3}</td><td>${d.s3}</td></tr>
+                                <tr><td>Gol 4</td><td>${d.q4}</td><td>${RATES.g4}</td><td>${d.s4}</td></tr>
                             </tbody>
                         </table>
+                        <div class="terbilang-box">"${terbilang(data.totalBayar)} Rupiah"</div>
                     </div>
 
-                    <!-- KOLOM KANAN: TOTAL & TTD -->
-                    <div class="col-right">
+                    <!-- Kanan: Total Bayar -->
+                    <div class="mid-right">
                         <div class="total-box">
-                            <div class="total-label">TOTAL BAYAR</div>
-                            <div class="total-amount">${formatRupiah(data.totalBayar)}</div>
+                            <span class="total-label">TOTAL BAYAR</span>
+                            <span class="total-amount">${formatRupiah(data.totalBayar)}</span>
                         </div>
-
-                        <div style="flex-grow: 1;"></div> 
-
-                        <div class="sig-box">
-                            <div class="sig-date">${formatDate(data.printDate)}</div>
-                            <div style="font-size: 7.5pt;">Penyetor,</div>
-                            <div class="sig-space"></div>
-                            <span class="sig-name">${data.depositor}</span>
-                        </div>
-
-                        <div class="sig-box">
-                            <div class="sig-date">${formatDate(data.printDate)}</div>
-                            <div style="font-size: 7.5pt;">Bendahara,</div>
-                            <div class="sig-space"></div>
-                            <span class="sig-name">Nama Petugas</span>
-                            <div style="font-size: 6pt;">NIP. ...................</div>
+                        <div class="total-box">
+                            <span class="total-label">BAYAR 50%</span>
+                            <span class="total-amount sub">${formatRupiah(data.bayar50)}</span>
                         </div>
                     </div>
+                </div>
 
+                <!-- KOLOM BAWAH (Tanda Tangan) -->
+                <div class="col-bottom">
+                    <div class="sig-col">
+                        <div class="sig-date">${formatDate(data.printDate)}</div>
+                        <div class="sig-title">Penyetor,</div>
+                        <div class="sig-space"></div>
+                        <span class="sig-name">${data.depositor}</span>
+                    </div>
+                    <div class="sig-col">
+                        <div class="sig-date">${formatDate(data.printDate)}</div>
+                        <div class="sig-title">Penerima,</div>
+                        <div class="sig-space"></div>
+                        <span class="sig-name">Nama Bendahara</span>
+                        <div class="sig-nip">NIP. ............................</div>
+                    </div>
                 </div>
             `;
         }
 
-        function formatRupiah(num) {
-            return "Rp " + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        }
-
-        function formatDate(dateString) {
-            if(!dateString) return "-";
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('id-ID', options);
-        }
-
-        function showToast(message, type = "success") {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.style.background = type === "error" ? "#ef4444" : "#333";
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        function toRoman(num) {
-            const roman = {M:1000,CM:900,D:500,CD:400,C:100,XC:90,L:50,XL:40,X:10,IX:9,V:5,IV:4,I:1};
-            let str = '';
-            for (let i of Object.keys(roman)) {
-                let q = Math.floor(num / roman[i]);
-                num -= q * roman[i];
-                str += i.repeat(q);
-            }
-            return str;
-        }
-
-        function terbilang(nilai) {
-            nilai = Math.abs(nilai);
-            const huruf = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
-            let temp = "";
-            
-            if (nilai < 12) {
-                temp = " " + huruf[nilai];
-            } else if (nilai < 20) {
-                temp = terbilang(nilai - 10) + " Belas";
-            } else if (nilai < 100) {
-                temp = terbilang(Math.floor(nilai / 10)) + " Puluh" + terbilang(nilai % 10);
-            } else if (nilai < 200) {
-                temp = " Seratus" + terbilang(nilai - 100);
-            } else if (nilai < 1000) {
-                temp = terbilang(Math.floor(nilai / 100)) + " Ratus" + terbilang(nilai % 100);
-            } else if (nilai < 2000) {
-                temp = " Seribu" + terbilang(nilai - 1000);
-            } else if (nilai < 1000000) {
-                temp = terbilang(Math.floor(nilai / 1000)) + " Ribu" + terbilang(nilai % 1000);
-            } else if (nilai < 1000000000) {
-                temp = terbilang(Math.floor(nilai / 1000000)) + " Juta" + terbilang(nilai % 1000000);
-            } else if (nilai < 1000000000000) {
-                temp = terbilang(Math.floor(nilai / 1000000000)) + " Milyar" + terbilang(nilai % 1000000000);
-            }
-            return temp;
-        }
+        function formatRupiah(num) { return "Rp " + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+        function formatDate(str) { if(!str) return "-"; return new Date(str).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'}); }
+        function showToast(msg, type="success") { const t=document.getElementById('toast'); t.textContent=msg; t.style.background = type=="error"?"#ef4444":"#333"; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 3000); }
+        function toRoman(num) { const roman={M:1000,CM:900,D:500,CD:400,C:100,XC:90,L:50,XL:40,X:10,IX:9,V:5,IV:4,I:1}; let str=''; for(let i of Object.keys(roman)){let q=Math.floor(num/roman[i]);num-=q*roman[i];str+=i.repeat(q);}return str;}
+        function terbilang(n) { n=Math.abs(n); const h=["","Satu","Dua","Tiga","Empat","Lima","Enam","Tujuh","Delapan","Sembilan","Sepuluh","Sebelas"];let t="";if(n<12)t=" "+h[n];else if(n<20)t=terbilang(n-10)+" Belas";else if(n<100)t=terbilang(Math.floor(n/10))+" Puluh"+terbilang(n%10);else if(n<200)t=" Seratus"+terbilang(n-100);else if(n<1000)t=terbilang(Math.floor(n/100))+" Ratus"+terbilang(n%100);else if(n<2000)t=" Seribu"+terbilang(n-1000);else if(n<1000000)t=terbilang(Math.floor(n/1000))+" Ribu"+terbilang(n%1000);else if(n<1000000000)t=terbilang(Math.floor(n/1000000))+" Juta"+terbilang(n%1000000);return t;}
     </script>
 </body>
 </html>
