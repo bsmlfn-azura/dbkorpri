@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Kwitansi Korpri Bangkalan</title>
+    <title>Sistem Iuran Korpri Bangkalan</title>
     <style>
         :root {
             --primary-color: #2563eb;
@@ -38,6 +38,25 @@
         .section.active { display: block; }
         .card { background: var(--surface-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
         .card h2 { margin-bottom: 1.5rem; font-size: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+
+        /* Dashboard Styles */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .stat-number { font-size: 2rem; font-weight: bold; color: var(--primary-color); margin: 10px 0; }
+        .stat-label { font-size: 0.9rem; color: #6b7280; font-weight: 500; }
 
         /* Form */
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
@@ -220,8 +239,9 @@
     <aside>
         <h1>Keuangan OPD <br><small style="font-size:0.7em; color:#666">(KORP/BKL)</small></h1>
         <nav>
-            <button id="nav-entry" class="active" onclick="switchTab('entry')">📝 Entri Transaksi</button>
-            <button id="nav-report" onclick="switchTab('report')">📊 Laporan Data (Sheet)</button>
+            <button id="nav-dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button id="nav-entry" onclick="switchTab('entry')">📝 Entri Transaksi</button>
+            <button id="nav-report" onclick="switchTab('report')">📋 Laporan Data</button>
         </nav>
     </aside>
 
@@ -229,8 +249,39 @@
         <!-- Loading -->
         <div id="loading" class="loading-overlay"><div class="spinner"></div><p>Memuat...</p></div>
 
+        <!-- DASHBOARD SECTION -->
+        <section id="section-dashboard" class="section active">
+            <div class="card">
+                <h2>Dashboard Transaksi</h2>
+                
+                <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--primary-color);">Jumlah Transaksi Per Petugas</h3>
+                <div class="stats-grid" id="petugasStatsGrid">
+                    <!-- Cards will be injected here -->
+                    <div class="stat-card">
+                        <div class="stat-label">Memuat data...</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem; font-size: 1rem; color: var(--primary-color);">Rekap Transaksi Bulanan</h3>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Bulan</th>
+                                <th>Tahun</th>
+                                <th>Jumlah Transaksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monthlyStatsTableBody">
+                            <!-- Rows injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <!-- ENTRY SECTION -->
-        <section id="section-entry" class="section active">
+        <section id="section-entry" class="section">
             <div class="card">
                 <h2>Form Transaksi Baru</h2>
                 <form id="transactionForm">
@@ -336,6 +387,13 @@
             "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
             "Juli", "Agustus", "September", "Oktober", "November", "Desember"
         ];
+        const PETUGAS_LIST = [
+            "Dewi Aniza, SE.MM",
+            "Dita Ayuningtyas P, SE",
+            "Rusdi Mardiyanto, SH",
+            "Samsuri, SE"
+        ];
+
         let transactions = [];
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -344,7 +402,9 @@
             const dateStr = today.toISOString().split('T')[0];
             document.getElementById('printDate').value = dateStr;
             document.getElementById('depositDate').value = dateStr;
-            fetchLastReceiptNumber();
+            
+            // Default load dashboard
+            switchTab('dashboard'); 
         });
 
         function initDateDropdowns() {
@@ -375,6 +435,7 @@
             document.getElementById(`section-${tab}`).classList.add('active');
             document.getElementById(`nav-${tab}`).classList.add('active');
             if(tab === 'report') fetchDataFromSheet();
+            if(tab === 'dashboard') renderDashboard();
         }
 
         function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
@@ -395,7 +456,6 @@
             return { total, fiftyPercent: total / 2, q1, q2, q3, q4, s1, s2, s3, s4 };
         }
 
-        // PERBAIKAN: Update fungsi ini untuk membaca format baru KORP/BKL/...
         function updateReceiptNumberDisplay(dataList) {
             const now = new Date();
             const currentMonthYear = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -404,8 +464,6 @@
                 const lastTxSameMonth = dataList.find(tx => tx.printDate.startsWith(currentMonthYear));
                 if(lastTxSameMonth) {
                     const parts = lastTxSameMonth.receiptNo.split('/');
-                    // Format baru: KORP/BKL/No/...
-                    // Index 0: KORP, Index 1: BKL, Index 2: Nomor
                     if(parts.length >= 3) lastSeq = parseInt(parts[2]);
                 }
             }
@@ -425,6 +483,88 @@
                 renderReport();
                 showLoading(false);
             }).catch(e=>{ showToast("Gagal ambil data", "error"); showLoading(false); });
+        }
+
+        // --- FUNGSI DASHBOARD BARU ---
+        function renderDashboard() {
+            if(transactions.length === 0) {
+                // Jika data belum dimuat (misal masuk dari dashboard langsung)
+                showLoading(true);
+                fetch(GOOGLE_SCRIPT_URL).then(r=>r.json()).then(data => {
+                    transactions = data;
+                    processDashboardData(data);
+                    showLoading(false);
+                }).catch(e=>{ showToast("Gagal ambil data", "error"); showLoading(false); });
+            } else {
+                processDashboardData(transactions);
+            }
+        }
+
+        function processDashboardData(data) {
+            // 1. Hitung per Petugas
+            const petugasCounts = {};
+            PETUGAS_LIST.forEach(name => petugasCounts[name] = 0);
+
+            // 2. Hitung per Bulan (Format: YYYY-MM)
+            const monthlyCounts = {};
+
+            data.forEach(tx => {
+                // Update Petugas
+                if(tx.receiverName) {
+                    if(petugasCounts[tx.receiverName] !== undefined) {
+                        petugasCounts[tx.receiverName]++;
+                    }
+                }
+
+                // Update Bulan
+                if(tx.printDate) {
+                    const dateParts = tx.printDate.split('-'); // YYYY-MM-DD
+                    if(dateParts.length >= 2) {
+                        const key = dateParts[0] + '-' + dateParts[1];
+                        monthlyCounts[key] = (monthlyCounts[key] || 0) + 1;
+                    }
+                }
+            });
+
+            // Render Petugas Cards
+            const petugasGrid = document.getElementById('petugasStatsGrid');
+            petugasGrid.innerHTML = '';
+            PETUGAS_LIST.forEach(name => {
+                const count = petugasCounts[name] || 0;
+                const card = document.createElement('div');
+                card.className = 'stat-card';
+                // Ambil nama depan saja untuk title singkat
+                const shortName = name.split(',')[0].trim(); 
+                card.innerHTML = `
+                    <div class="stat-label">Petugas: ${shortName}</div>
+                    <div class="stat-number">${count}</div>
+                    <div class="stat-label">Transaksi</div>
+                `;
+                petugasGrid.appendChild(card);
+            });
+
+            // Render Monthly Table
+            const monthlyBody = document.getElementById('monthlyStatsTableBody');
+            monthlyBody.innerHTML = '';
+            
+            // Urutkan bulan secara descending (terbaru di atas)
+            const sortedMonths = Object.keys(monthlyCounts).sort().reverse();
+
+            if(sortedMonths.length === 0) {
+                monthlyBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#999;">Belum ada data transaksi</td></tr>';
+            } else {
+                sortedMonths.forEach(key => {
+                    const [year, month] = key.split('-');
+                    const monthName = BULAN_NAMA[parseInt(month) - 1] || month;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${monthName}</td>
+                        <td>${year}</td>
+                        <td style="text-align: center; font-weight: bold;">${monthlyCounts[key]}</td>
+                    `;
+                    monthlyBody.appendChild(tr);
+                });
+            }
         }
 
         document.getElementById('transactionForm').addEventListener('submit', function(e) {
@@ -500,7 +640,6 @@
 
         function generateReceiptHTML(data) {
             const d = data.details;
-            // URL GAMBAR YANG DIPERBAIKI
             const logoUrl = "https://z-cdn-media.chatglm.cn/files/bdf8696e-2c15-43c9-931b-84464e66ee17.png?auth_key=1874763966-4804297fcfc1476295fa1111182667d4-0-e99fad2a346607c1c2efc95ed4a81203";
 
             return `
@@ -584,7 +723,7 @@
                         <div class="sig-title">Penerima,</div>
                         <div class="sig-space"></div>
                         <span class="sig-name">${data.receiverName}</span>
-                        
+                        <div class="sig-nip">NIP. ............................</div>
                     </div>
                 </div>
             `;
