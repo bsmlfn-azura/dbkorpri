@@ -119,26 +119,25 @@
             text-align: center; 
             margin-bottom: 4px; 
             padding-bottom: 2px;
-            border-bottom: 1px solid #ddd; /* Garis pemisah halus untuk kerapian */
+            border-bottom: 1px solid #ddd; 
         }
         .kop-row { 
             display: flex; 
             align-items: center; 
-            justify-content: center; /* UTAMA: Menengahkan Logo & Teks */
-            gap: 12px; /* Jarak antar elemen */
+            justify-content: center; 
+            gap: 12px; 
         }
         .kop-logo { 
-            width: 45px; /* UTAMA: Ukuran proporsional agar rapi */
+            width: 45px; 
             height: auto; 
             flex-shrink: 0; 
         }
         .kop-logo img { 
             width: 100%; 
-            display: block; /* Menghilangkan spasi bawah gambar */
+            display: block; 
         }
         .kop-text { 
-            text-align: center; /* UTAMA: Teks rata tengah di dalam bloknya */
-            /* flex-grow dihapus agar teks tidak melebar ke kanan */
+            text-align: center; 
         }
         .kop-text h2 { font-size: 9pt; font-weight: 900; text-transform: uppercase; margin: 0; line-height: 1.1; letter-spacing: 0.5px; }
         .kop-text h3 { font-size: 8pt; font-weight: 700; text-transform: uppercase; margin: 0; line-height: 1.1; }
@@ -396,6 +395,7 @@
             return { total, fiftyPercent: total / 2, q1, q2, q3, q4, s1, s2, s3, s4 };
         }
 
+        // PERBAIKAN: Update fungsi ini untuk membaca format baru KORP/BKL/...
         function updateReceiptNumberDisplay(dataList) {
             const now = new Date();
             const currentMonthYear = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -404,7 +404,9 @@
                 const lastTxSameMonth = dataList.find(tx => tx.printDate.startsWith(currentMonthYear));
                 if(lastTxSameMonth) {
                     const parts = lastTxSameMonth.receiptNo.split('/');
-                    if(parts.length >= 2) lastSeq = parseInt(parts[1]);
+                    // Format baru: KORP/BKL/No/...
+                    // Index 0: KORP, Index 1: BKL, Index 2: Nomor
+                    if(parts.length >= 3) lastSeq = parseInt(parts[2]);
                 }
             }
             const nextSeq = lastSeq + 1;
@@ -582,7 +584,7 @@
                         <div class="sig-title">Penerima,</div>
                         <div class="sig-space"></div>
                         <span class="sig-name">${data.receiverName}</span>
-                        <div class="sig-nip">NIP. ............................</div>
+                        
                     </div>
                 </div>
             `;
