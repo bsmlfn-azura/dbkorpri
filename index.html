@@ -18,7 +18,7 @@
         
         body { background-color: var(--bg-color); color: var(--text-color); display: flex; height: 100vh; overflow: hidden; }
 
-        /* Sidebar Navigation */
+        /* Sidebar */
         aside {
             width: 250px;
             background-color: var(--surface-color);
@@ -32,19 +32,22 @@
         nav button:hover { background-color: var(--bg-color); }
         nav button.active { background-color: var(--primary-color); color: white; font-weight: 600; }
 
-        /* Main Content */
+        /* Main */
         main { flex: 1; padding: 2rem; overflow-y: auto; position: relative; }
         .section { display: none; }
         .section.active { display: block; }
         .card { background: var(--surface-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
         .card h2 { margin-bottom: 1.5rem; font-size: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
 
-        /* Form Styles */
+        /* Form */
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
         .form-group { margin-bottom: 1rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 500; }
         .form-group input, .form-group select { width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem; }
         .form-group input[readonly] { background-color: #e5e7eb; cursor: not-allowed; }
+        
+        /* Combo input group for period */
+        .input-group { display: flex; gap: 0.5rem; }
 
         /* Buttons */
         .btn { padding: 0.6rem 1.2rem; border: none; border-radius: 4px; cursor: pointer; font-size: 0.95rem; font-weight: 500; transition: background 0.2s; }
@@ -52,14 +55,13 @@
         .btn-primary:hover { background-color: var(--secondary-color); }
         .btn-secondary { background-color: #6b7280; color: white; }
 
-        /* Data Table */
+        /* Data Tables */
         .golongan-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
         .golongan-table th, .golongan-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border-color); }
         .golongan-table th { background-color: #f9fafb; font-weight: 600; }
         .golongan-table input { width: 100px; padding: 0.4rem; border: 1px solid var(--border-color); border-radius: 4px; text-align: right; }
         .fixed-nominal { background-color: #f3f4f6; padding: 0.4rem; border-radius: 4px; text-align: right; display: inline-block; width: 100px;}
         
-        /* Report Table */
         .data-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
         .data-table th, .data-table td { padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); font-size: 0.9rem; }
         .data-table th { background-color: #f9fafb; position: sticky; top: 0; }
@@ -77,7 +79,6 @@
         .close-modal { position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem; }
         .modal-actions { margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end; }
 
-        /* Toast */
         .toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 12px 24px; border-radius: 4px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 2000; }
         .toast.show { opacity: 1; }
 
@@ -108,7 +109,7 @@
             gap: 2px; 
         }
 
-        /* --- 1. KOLOM ATAS: KOP --- */
+        /* Kolom Atas: Kop */
         .col-top {
             flex: 0 0 auto; 
             border-bottom: 2px double black;
@@ -117,23 +118,16 @@
         }
         .kop-container { text-align: center; margin-bottom: 2px; }
         .kop-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 1px; }
-        .kop-logo { 
-            width: 40px; height: 40px; 
-            flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center; 
-        }
-        .kop-logo img { 
-            height: 100%; width: auto; max-width: 45px; 
-        }
+        .kop-logo { width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .kop-logo img { height: 100%; width: auto; max-width: 45px; }
         .kop-text { flex-grow: 1; text-align: left; }
         .kop-text h2 { font-size: 9pt; font-weight: 900; text-transform: uppercase; margin: 0; line-height: 1.1; letter-spacing: 0.5px; }
         .kop-text h3 { font-size: 8pt; font-weight: 700; text-transform: uppercase; margin: 0; line-height: 1.1; }
-        
         .kw-title-row { text-align: center; }
         .kw-title { font-size: 10pt; font-weight: bold; text-decoration: underline; text-transform: uppercase; }
         .kw-no { font-size: 7.5pt; }
 
-        /* --- 2. KOLOM TENGAH --- */
+        /* Kolom Tengah */
         .col-mid {
             flex: 1; 
             display: flex; 
@@ -141,7 +135,6 @@
             gap: 5px;
             overflow: hidden; 
         }
-
         .mid-left {
             flex: 2; 
             display: flex;
@@ -158,7 +151,6 @@
         .compact-table td:first-child { text-align: left; }
         .compact-table td:nth-last-child(2), .compact-table td:last-child { text-align: right; }
         .compact-table th { background: #eee; }
-        
         .terbilang-box { font-style: italic; font-size: 7pt; background: #f9f9f9; padding: 2px; border: 1px solid #eee; margin-top: 2px;}
 
         .mid-right {
@@ -177,19 +169,18 @@
         .total-label { font-size: 7pt; font-weight: bold; display: block; }
         .total-amount { font-size: 10pt; font-weight: 900; color: #000; }
         
-        /* KELAS KHUSUS UNTUK HIGHLIGHT BAYAR 50% */
         .highlight-total {
-            border: 2px solid black; /* Border lebih tebal */
-            background-color: #fffbe6; /* Sedikit warna kuning muda agar menonjol */
+            border: 2px solid black;
+            background-color: #fffbe6;
         }
         .highlight-total .total-label, 
         .highlight-total .total-amount {
-            font-size: 11pt !important; /* Font lebih besar dari total biasa */
-            font-weight: 900 !important; /* Sangat tebal */
+            font-size: 11pt !important;
+            font-weight: 900 !important;
             color: #000;
         }
 
-        /* --- 3. KOLOM BAWAH: TANDA TANGAN --- */
+        /* Kolom Bawah */
         .col-bottom {
             flex: 0 0 auto; 
             display: flex; 
@@ -234,6 +225,22 @@
                         <div class="form-group"><label>OPD / Unit Kerja</label><input type="text" id="opdName" required></div>
                         <div class="form-group"><label>Tanggal Setor</label><input type="date" id="depositDate" required></div>
                     </div>
+                    
+                    <!-- INPUT PERIODE BARU -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Periode Setoran</label>
+                            <div class="input-group">
+                                <select id="periodeBulan" required>
+                                    <!-- Diisi oleh JS -->
+                                </select>
+                                <select id="periodeTahun" required>
+                                    <!-- Diisi oleh JS -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                     <h3>Rincian Nominal</h3>
                     <table class="golongan-table">
                         <thead><tr><th>Golongan</th><th>Nominal</th><th>Jml</th><th>Subtotal</th></tr></thead>
@@ -265,7 +272,7 @@
                 </div>
                 <div style="overflow-x: auto;">
                     <table class="data-table">
-                        <thead><tr><th>No Kwitansi</th><th>Tgl Cetak</th><th>Penyetor</th><th>OPD</th><th>Total</th><th>50%</th><th>Aksi</th></tr></thead>
+                        <thead><tr><th>No Kwitansi</th><th>Tgl Cetak</th><th>Penyetor</th><th>Periode</th><th>OPD</th><th>Total</th><th>50%</th><th>Aksi</th></tr></thead>
                         <tbody id="reportTableBody"></tbody>
                     </table>
                 </div>
@@ -301,14 +308,48 @@
         if(GOOGLE_SCRIPT_URL.includes("PASTE")) alert("Masukkan URL Google Script!");
         
         const RATES = { g1: 2000, g2: 5000, g3: 7000, g4: 10000 };
+        const BULAN_NAMA = [
+            "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        ];
         let transactions = [];
 
         document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('printDate').value = today;
-            document.getElementById('depositDate').value = today;
+            initDateDropdowns(); // Inisialisasi dropdown bulan/tahun
+            
+            const today = new Date();
+            const dateStr = today.toISOString().split('T')[0];
+            document.getElementById('printDate').value = dateStr;
+            document.getElementById('depositDate').value = dateStr;
+            
             fetchLastReceiptNumber();
         });
+
+        // Fungsi baru untuk mengisi dropdown Bulan & Tahun
+        function initDateDropdowns() {
+            const monthSelect = document.getElementById('periodeBulan');
+            const yearSelect = document.getElementById('periodeTahun');
+            const currentYear = new Date().getFullYear();
+
+            // Isi Bulan
+            BULAN_NAMA.forEach((bln, index) => {
+                const option = document.createElement('option');
+                option.value = bln;
+                option.textContent = bln;
+                // Set default ke bulan sekarang (index 0-11)
+                if(index === new Date().getMonth()) option.selected = true;
+                monthSelect.appendChild(option);
+            });
+
+            // Isi Tahun (3 tahun ke belakang, 1 tahun ke depan)
+            for(let i = currentYear - 1; i <= currentYear + 1; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                if(i === currentYear) option.selected = true;
+                yearSelect.appendChild(option);
+            }
+        }
 
         function switchTab(tab) {
             document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
@@ -372,11 +413,16 @@
             
             const receiptNo = document.getElementById('receiptNo').value;
             const formData = {
-                receiptNo, printDate: document.getElementById('printDate').value,
+                receiptNo, 
+                printDate: document.getElementById('printDate').value,
                 depositor: document.getElementById('depositorName').value,
                 opd: document.getElementById('opdName').value,
                 depositDate: document.getElementById('depositDate').value,
-                details: calcs, totalBayar: calcs.total, bayar50: calcs.fiftyPercent
+                periodeBulan: document.getElementById('periodeBulan').value, // DATA BARU
+                periodeTahun: document.getElementById('periodeTahun').value, // DATA BARU
+                details: calcs, 
+                totalBayar: calcs.total, 
+                bayar50: calcs.fiftyPercent
             };
 
             showLoading(true);
@@ -399,6 +445,7 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('printDate').value = today;
             document.getElementById('depositDate').value = today;
+            initDateDropdowns(); // Reset dropdown ke default
             fetchLastReceiptNumber();
             calculateTotal();
         }
@@ -410,7 +457,10 @@
             document.getElementById('emptyState').style.display = 'none';
             transactions.forEach(tx => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${tx.receiptNo}</td><td>${formatDate(tx.printDate)}</td><td>${tx.depositor}</td><td>${tx.opd}</td><td>${formatRupiah(tx.totalBayar)}</td><td>${formatRupiah(tx.bayar50)}</td>
+                // Menampilkan Periode di tabel laporan
+                const periodeStr = `${tx.periodeBulan || ''} ${tx.periodeTahun || ''}`.trim();
+                tr.innerHTML = `<td>${tx.receiptNo}</td><td>${formatDate(tx.printDate)}</td><td>${tx.depositor}</td>
+                <td>${periodeStr}</td><td>${tx.opd}</td><td>${formatRupiah(tx.totalBayar)}</td><td>${formatRupiah(tx.bayar50)}</td>
                 <td><button class="btn btn-primary" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick='reprintTx(${JSON.stringify(tx)})'>Cetak</button></td>`;
                 tbody.appendChild(tr);
             });
@@ -433,16 +483,13 @@
                 <div class="col-top">
                     <div class="kop-container">
                         <div class="kop-row">
-                            <!-- LOGO KIRI (Gambar User) -->
                             <div class="kop-logo">
                                 <img src="https://z-cdn-media.chatglm.cn/files/85117bf4-68b1-4967-8b15-202f6b57f41b.png?auth_key=1874712176-d1e5093667ab43289db76ce5b2852bb6-0-d610fac3aa93aad1b9d41392cecef290" alt="Logo Korpri">
                             </div>
-                            <!-- TEK INSTANSI -->
                             <div class="kop-text">
                                 <h2>DEWAN PENGURUS KORPRI</h2>
                                 <h3>KABUPATEN BANGKALAN</h3>
                             </div>
-                            <!-- LOGO KANAN DIHAPUS -->
                         </div>
                     </div>
                     <div class="kw-title-row">
@@ -464,6 +511,10 @@
                             <div class="data-value">${data.opd}</div>
                         </div>
                         <div class="data-row">
+                            <div class="data-label">Periode</div>
+                            <div class="data-value">${data.periodeBulan} ${data.periodeTahun}</div>
+                        </div>
+                        <div class="data-row">
                             <div class="data-label">Tgl. Setor</div>
                             <div class="data-value">${formatDate(data.depositDate)}</div>
                         </div>
@@ -479,7 +530,6 @@
                             </tbody>
                         </table>
                         
-                        <!-- TERBILANG DIBACA DARI BAYAR 50% -->
                         <div class="terbilang-box">"${terbilang(data.bayar50)} Rupiah"</div>
                     </div>
 
@@ -489,7 +539,6 @@
                             <span class="total-label">TOTAL BAYAR</span>
                             <span class="total-amount">${formatRupiah(data.totalBayar)}</span>
                         </div>
-                        <!-- BAYAR 50% DI BOLD & AGAK BESAR -->
                         <div class="total-box highlight-total">
                             <span class="total-label">BAYAR 50%</span>
                             <span class="total-amount">${formatRupiah(data.bayar50)}</span>
