@@ -7,7 +7,8 @@
     <style>
         :root {
             --primary-color: #2563eb;
-            --secondary-color: #1e40af;
+            --secondary-color: #1e40af;   
+            
             --bg-color: #f3f4f6;
             --surface-color: #ffffff;
             --text-color: #1f2937;
@@ -325,7 +326,7 @@
                             <div class="summary-val" id="summaryCount">0</div>
                         </div>
                         <div class="summary-item">
-                            <div class="summary-title">Total Nominal (Rp)</div>
+                            <div class="summary-title">Total Nominal 50% (Rp)</div>
                             <div class="summary-val" id="summaryTotal">Rp 0</div>
                         </div>
                     </div>
@@ -747,7 +748,7 @@
                 if (fPetugas !== "Semua" && tx.receiverName !== fPetugas) return;
 
                 // Match
-                totalNominal += tx.totalBayar; 
+                totalNominal += tx.bayar50; 
                 count++;
                 filteredData.push(tx);
             });
