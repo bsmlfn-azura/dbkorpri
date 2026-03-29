@@ -250,7 +250,7 @@
         .sig-name { text-decoration: underline; font-weight: bold; display: block; margin-top: 2px; word-wrap: break-word; line-height: 1.2;}
         .sig-nip { font-size: 6pt; }
 
-        /* BLOCKING MODAL STYLE (NEW) */
+        /* BLOCKING MODAL STYLE */
         .blocking-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(220, 38, 38, 0.95); z-index: 9999;
@@ -271,17 +271,17 @@
         <h1>Keuangan OPD <br><small style="font-size:0.7em; color:#666">(KORP/BKL)</small></h1>
         <nav>
             <button id="nav-dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
-            <button id="nav-entry" onclick="switchTab('entry')">📝 Entri Transaksi</button>
+            <button id="nav-entry" class="active" onclick="switchTab('entry')">📝 Entri Transaksi</button>
             <button id="nav-report" onclick="switchTab('report')">📋 Laporan Data</button>
         </nav>
     </aside>
 
     <main>
         <!-- Loading -->
-        <div id="loading" class="loading-overlay"><div class="spinner"></div><p>Memuat...</p></div>
+        <div id="loading" class="loading-overlay"><div class="spinner"></div><p>Memuat Nomor Kwitansi...</p></div>
 
         <!-- DASHBOARD SECTION -->
-        <section id="section-dashboard" class="section active">
+        <section id="section-dashboard" class="section">
             
             <!-- 1. Ringkasan Petugas -->
             <div class="card">
@@ -301,21 +301,18 @@
                         <label style="font-size:0.85rem; font-weight:600; margin-bottom:4px; display:block;">Bulan</label>
                         <select id="filterBulan" class="form-control" onchange="filterSummary()">
                             <option value="Semua">Semua Bulan</option>
-                            <!-- Diisi JS -->
                         </select>
                     </div>
                     <div class="filter-item">
                         <label style="font-size:0.85rem; font-weight:600; margin-bottom:4px; display:block;">Tahun</label>
                         <select id="filterTahun" class="form-control" onchange="filterSummary()">
                             <option value="Semua">Semua Tahun</option>
-                            <!-- Diisi JS -->
                         </select>
                     </div>
                     <div class="filter-item">
                         <label style="font-size:0.85rem; font-weight:600; margin-bottom:4px; display:block;">Petugas</label>
                         <select id="filterPetugas" class="form-control" onchange="filterSummary()">
                             <option value="Semua">Semua Petugas</option>
-                            <!-- Diisi JS -->
                         </select>
                     </div>
                 </div>
@@ -372,7 +369,7 @@
         </section>
 
         <!-- ENTRY SECTION -->
-        <section id="section-entry" class="section">
+        <section id="section-entry" class="section active">
             <div class="card">
                 <h2>Form Transaksi Baru</h2>
                 <form id="transactionForm">
@@ -492,12 +489,11 @@
         // ==========================================================
         // 1. KONFIGURASI URL (WAJIB DIISI OLEH USER)
         // ==========================================================
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzUIqSYISFjy_RRAcTVOz355ZTvtO_y_o986sa72LiSUfBKUkRiAJp1PkHn7H60X6_5wA/exec"; 
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2dLrH58ZrnlI1dH2fDTOJDhFYQWytg_wbSTvah25q-F429yUXqJce_W-eD1Iv0NEW6A/exec"; 
         
-        // Cek URL saat load halaman (Untuk mencegah error no data)
+        // Cek URL saat load halaman
         if (GOOGLE_SCRIPT_URL.includes("PASTE") || !GOOGLE_SCRIPT_URL) {
             document.getElementById('blockingModal').style.display = 'flex';
-            // Stop execution jangan jalankan kode lain
             throw new Error("URL Script belum diisi");
         }
         
@@ -516,17 +512,17 @@
         let transactions = [];
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Jika URL sudah valid, lanjut inisialisasi
             try {
                 initDateDropdowns();
                 initFilterDropdowns();
                 const today = new Date();
-                const dateStr = today.toISOString().split('T')[0];
+                const dateStr = today.tohasilISOString().split('T')[0];
                 document.getElementById('printDate').value = dateStr;
                 document.getElementById('depositDate').value = dateStr;
                 
-                // Default load dashboard
-                switchTab('dashboard'); 
+                // PERUBAHAN: Otomatis masuk ke tab Entry dan ambil nomor kwitansi
+                switchTab('entry'); 
+                fetchLastReceiptNumber(); 
             } catch (e) {
                 console.error("Init Error", e);
             }
@@ -614,7 +610,6 @@
             const currentMonthYear = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
             let lastSeq = 0;
             
-            // Pastikan dataList adalah array
             if (Array.isArray(dataList) && dataList.length > 0) {
                 const lastTxSameMonth = dataList.find(tx => tx.printDate && tx.printDate.startsWith(currentMonthYear));
                 if(lastTxSameMonth) {
@@ -622,6 +617,7 @@
                     // PARSING ROBUST
                     if(parts.length >= 3) {
                         let seq = parseInt(parts[2]);
+                        // Jika NaN (misal data kotor), reset ke 0
                         if(isNaN(seq)) seq = 0;
                         lastSeq = seq;
                     }
@@ -664,7 +660,6 @@
         // --- FUNGSI DASHBOARD ---
         function renderDashboard() {
             if(transactions.length === 0) {
-                // Jika data di memori kosong, fetch dulu
                 showLoading(true);
                 fetch(GOOGLE_SCRIPT_URL).then(r=>r.json()).then(data => {
                     transactions = data;
@@ -744,7 +739,7 @@
             let filteredData = [];
 
             transactions.forEach(tx => {
-                // Filter Bulan
+                // Filter Bulan (Bandingkan string untuk aman)
                 if (fBulan !== "Semua" && String(tx.periodeBulan) !== fBulan) return;
                 // Filter Tahun
                 if (fTahun !== "Semua" && String(tx.periodeTahun) !== fTahun) return;
@@ -953,7 +948,6 @@
                         <div class="sig-title">Penerima,</div>
                         <div class="sig-space"></div>
                         <span class="sig-name">${data.receiverName}</span>
-                        
                     </div>
                 </div>
             `;
