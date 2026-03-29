@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Iuran Korpri Bangkalan</title>
+    <title>Sistem Kwitansi Korpri Bangkalan</title>
     <style>
         :root {
             --primary-color: #2563eb;
@@ -58,6 +58,23 @@
         .stat-number { font-size: 2rem; font-weight: bold; color: var(--primary-color); margin: 10px 0; }
         .stat-label { font-size: 0.9rem; color: #6b7280; font-weight: 500; }
 
+        /* Filter Summary Styles */
+        .filter-row { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .filter-item { flex: 1; min-width: 150px; }
+        .summary-result-box {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .summary-item { text-align: center; }
+        .summary-val { font-size: 1.5rem; font-weight: bold; color: #0f172a; }
+        .summary-title { font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+
         /* Form */
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
         .form-group { margin-bottom: 1rem; }
@@ -72,6 +89,7 @@
         .btn-primary { background-color: var(--primary-color); color: white; }
         .btn-primary:hover { background-color: var(--secondary-color); }
         .btn-secondary { background-color: #6b7280; color: white; }
+        .btn-success { background-color: var(--success-color); color: white; }
 
         /* Data Tables */
         .golongan-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
@@ -251,18 +269,84 @@
 
         <!-- DASHBOARD SECTION -->
         <section id="section-dashboard" class="section active">
+            
+            <!-- 1. Ringkasan Petugas -->
             <div class="card">
-                <h2>Dashboard Transaksi</h2>
-                
+                <h2>Dashboard</h2>
                 <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--primary-color);">Jumlah Transaksi Per Petugas</h3>
                 <div class="stats-grid" id="petugasStatsGrid">
-                    <!-- Cards will be injected here -->
-                    <div class="stat-card">
-                        <div class="stat-label">Memuat data...</div>
+                    <div class="stat-card"><div class="stat-label">Memuat...</div></div>
+                </div>
+            </div>
+
+            <!-- 2. Ringkasan Setoran (FITUR BARU) -->
+            <div class="card">
+                <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--primary-color);">🔍 Ringkasan Setoran (Nominal)</h3>
+                
+                <div class="filter-row">
+                    <div class="filter-item">
+                        <label style="font-size:0.85rem; font-weight:600; margin-bottom:4px; display:block;">Bulan</label>
+                        <select id="filterBulan" class="form-control">
+                            <option value="Semua">Semua Bulan</option>
+                            <!-- Diisi JS -->
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label style="font-size:0.85rem; font-weight:600; margin-bottom:4px; display:block;">Tahun</label>
+                        <select id="filterTahun" class="form-control">
+                            <option value="Semua">Semua Tahun</option>
+                            <!-- Diisi JS -->
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label style="font-size:0.85rem; font-weight:600; margin-bottom:4px; display:block;">Petugas</label>
+                        <select id="filterPetugas" class="form-control">
+                            <option value="Semua">Semua Petugas</option>
+                            <!-- Diisi JS -->
+                        </select>
                     </div>
                 </div>
 
-                <h3 style="margin-top: 2rem; margin-bottom: 1rem; font-size: 1rem; color: var(--primary-color);">Rekap Transaksi Bulanan</h3>
+                <div style="text-align: right; margin-bottom: 1rem;">
+                    <button class="btn btn-success" onclick="filterSummary()">Tampilkan Ringkasan</button>
+                </div>
+
+                <!-- Hasil Filter -->
+                <div id="summaryResultContainer" style="display:none;">
+                    <div class="summary-result-box">
+                        <div class="summary-item">
+                            <div class="summary-title">Total Transaksi</div>
+                            <div class="summary-val" id="summaryCount">0</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-title">Total Nominal (Rp)</div>
+                            <div class="summary-val" id="summaryTotal">Rp 0</div>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-top:1.5rem; font-size:0.95rem; color:#666;">Detail Transaksi Sesuai Filter:</h4>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>No. Kwitansi</th>
+                                    <th>Tanggal Cetak</th>
+                                    <th>Penyetor</th>
+                                    <th>OPD</th>
+                                    <th>Petugas</th>
+                                    <th style="text-align:right;">Nominal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="filteredTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="emptyFilterState" style="text-align: center; padding: 1rem; color: #999; display: none;">Tidak ada data sesuai filter.</div>
+                </div>
+            </div>
+
+            <!-- 3. Rekap Bulanan -->
+            <div class="card">
+                <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--primary-color);">📅 Rekap Transaksi Bulanan</h3>
                 <div style="overflow-x: auto;">
                     <table class="data-table">
                         <thead>
@@ -272,9 +356,7 @@
                                 <th>Jumlah Transaksi</th>
                             </tr>
                         </thead>
-                        <tbody id="monthlyStatsTableBody">
-                            <!-- Rows injected here -->
-                        </tbody>
+                        <tbody id="monthlyStatsTableBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -398,6 +480,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initDateDropdowns();
+            initFilterDropdowns(); // Init filter dropdowns
             const today = new Date();
             const dateStr = today.toISOString().split('T')[0];
             document.getElementById('printDate').value = dateStr;
@@ -427,6 +510,37 @@
                 if(i === currentYear) option.selected = true;
                 yearSelect.appendChild(option);
             }
+        }
+
+        function initFilterDropdowns() {
+            // Init Bulan Filter
+            const fMonth = document.getElementById('filterBulan');
+            BULAN_NAMA.forEach(bln => {
+                const opt = document.createElement('option');
+                opt.value = bln;
+                opt.textContent = bln;
+                fMonth.appendChild(opt);
+            });
+
+            // Init Tahun Filter
+            const fYear = document.getElementById('filterTahun');
+            const currentYear = new Date().getFullYear();
+            for(let i = currentYear - 2; i <= currentYear; i++) {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = i;
+                if(i === currentYear) opt.selected = true; // Default tahun ini
+                fYear.appendChild(opt);
+            }
+
+            // Init Petugas Filter
+            const fPetugas = document.getElementById('filterPetugas');
+            PETUGAS_LIST.forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                fPetugas.appendChild(opt);
+            });
         }
 
         function switchTab(tab) {
@@ -485,10 +599,9 @@
             }).catch(e=>{ showToast("Gagal ambil data", "error"); showLoading(false); });
         }
 
-        // --- FUNGSI DASHBOARD BARU ---
+        // --- FUNGSI DASHBOARD ---
         function renderDashboard() {
             if(transactions.length === 0) {
-                // Jika data belum dimuat (misal masuk dari dashboard langsung)
                 showLoading(true);
                 fetch(GOOGLE_SCRIPT_URL).then(r=>r.json()).then(data => {
                     transactions = data;
@@ -505,24 +618,16 @@
             const petugasCounts = {};
             PETUGAS_LIST.forEach(name => petugasCounts[name] = 0);
 
-            // 2. Hitung per Bulan (Format: YYYY-MM)
+            // 2. Hitung per Bulan
             const monthlyCounts = {};
 
             data.forEach(tx => {
-                // Update Petugas
-                if(tx.receiverName) {
-                    if(petugasCounts[tx.receiverName] !== undefined) {
-                        petugasCounts[tx.receiverName]++;
-                    }
+                if(tx.receiverName && petugasCounts[tx.receiverName] !== undefined) {
+                    petugasCounts[tx.receiverName]++;
                 }
-
-                // Update Bulan
                 if(tx.printDate) {
-                    const dateParts = tx.printDate.split('-'); // YYYY-MM-DD
-                    if(dateParts.length >= 2) {
-                        const key = dateParts[0] + '-' + dateParts[1];
-                        monthlyCounts[key] = (monthlyCounts[key] || 0) + 1;
-                    }
+                    const key = tx.printDate.split('-').slice(0, 2).join('-');
+                    monthlyCounts[key] = (monthlyCounts[key] || 0) + 1;
                 }
             });
 
@@ -531,10 +636,9 @@
             petugasGrid.innerHTML = '';
             PETUGAS_LIST.forEach(name => {
                 const count = petugasCounts[name] || 0;
+                const shortName = name.split(',')[0].trim(); 
                 const card = document.createElement('div');
                 card.className = 'stat-card';
-                // Ambil nama depan saja untuk title singkat
-                const shortName = name.split(',')[0].trim(); 
                 card.innerHTML = `
                     <div class="stat-label">Petugas: ${shortName}</div>
                     <div class="stat-number">${count}</div>
@@ -546,23 +650,72 @@
             // Render Monthly Table
             const monthlyBody = document.getElementById('monthlyStatsTableBody');
             monthlyBody.innerHTML = '';
-            
-            // Urutkan bulan secara descending (terbaru di atas)
             const sortedMonths = Object.keys(monthlyCounts).sort().reverse();
-
             if(sortedMonths.length === 0) {
-                monthlyBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#999;">Belum ada data transaksi</td></tr>';
+                monthlyBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#999;">Belum ada data</td></tr>';
             } else {
                 sortedMonths.forEach(key => {
                     const [year, month] = key.split('-');
                     const monthName = BULAN_NAMA[parseInt(month) - 1] || month;
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${monthName}</td>
-                        <td>${year}</td>
-                        <td style="text-align: center; font-weight: bold;">${monthlyCounts[key]}</td>
-                    `;
+                    tr.innerHTML = `<td>${monthName}</td><td>${year}</td><td style="text-align: center; font-weight: bold;">${monthlyCounts[key]}</td>`;
                     monthlyBody.appendChild(tr);
+                });
+            }
+        }
+
+        // --- FUNGSI RINGKASAN SETORAN (FILTER) ---
+        function filterSummary() {
+            const fBulan = document.getElementById('filterBulan').value;
+            const fTahun = document.getElementById('filterTahun').value;
+            const fPetugas = document.getElementById('filterPetugas').value;
+
+            let totalNominal = 0;
+            let count = 0;
+            let filteredData = [];
+
+            transactions.forEach(tx => {
+                // Filter Bulan
+                if (fBulan !== "Semua" && tx.periodeBulan !== fBulan) return;
+                // Filter Tahun
+                if (fTahun !== "Semua" && tx.periodeTahun != fTahun) return;
+                // Filter Petugas
+                if (fPetugas !== "Semua" && tx.receiverName !== fPetugas) return;
+
+                // Match
+                totalNominal += tx.totalBayar; // Menggunakan total bayar sebagai nominal setoran
+                count++;
+                filteredData.push(tx);
+            });
+
+            // Tampilkan Hasil
+            document.getElementById('summaryResultContainer').style.display = 'block';
+            document.getElementById('summaryCount').textContent = count;
+            document.getElementById('summaryTotal').textContent = formatRupiah(totalNominal);
+
+            renderFilteredTable(filteredData);
+        }
+
+        function renderFilteredTable(data) {
+            const tbody = document.getElementById('filteredTableBody');
+            const emptyState = document.getElementById('emptyFilterState');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+                data.forEach(tx => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${tx.receiptNo}</td>
+                        <td>${formatDate(tx.printDate)}</td>
+                        <td>${tx.depositor}</td>
+                        <td>${tx.opd}</td>
+                        <td>${tx.receiverName}</td>
+                        <td style="text-align: right;">${formatRupiah(tx.totalBayar)}</td>
+                    `;
+                    tbody.appendChild(tr);
                 });
             }
         }
