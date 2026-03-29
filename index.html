@@ -145,7 +145,7 @@
             gap: 2px; 
         }
 
-        /* Kolom Atas: Kop (UPDATE RAPI & TENGAH) */
+        /* Kolom Atas: Kop */
         .col-top {
             flex: 0 0 auto; 
             border-bottom: 2px double black;
@@ -279,40 +279,36 @@
                 </div>
             </div>
 
-            <!-- 2. Ringkasan Setoran (FITUR BARU) -->
+            <!-- 2. Ringkasan Setoran (OTOMATIS TAMPIL) -->
             <div class="card">
                 <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--primary-color);">🔍 Ringkasan Setoran (Nominal)</h3>
                 
                 <div class="filter-row">
                     <div class="filter-item">
                         <label style="font-size:0.85rem; font-weight:600; margin-bottom:4px; display:block;">Bulan</label>
-                        <select id="filterBulan" class="form-control">
+                        <select id="filterBulan" class="form-control" onchange="filterSummary()">
                             <option value="Semua">Semua Bulan</option>
                             <!-- Diisi JS -->
                         </select>
                     </div>
                     <div class="filter-item">
                         <label style="font-size:0.85rem; font-weight:600; margin-bottom:4px; display:block;">Tahun</label>
-                        <select id="filterTahun" class="form-control">
+                        <select id="filterTahun" class="form-control" onchange="filterSummary()">
                             <option value="Semua">Semua Tahun</option>
                             <!-- Diisi JS -->
                         </select>
                     </div>
                     <div class="filter-item">
                         <label style="font-size:0.85rem; font-weight:600; margin-bottom:4px; display:block;">Petugas</label>
-                        <select id="filterPetugas" class="form-control">
+                        <select id="filterPetugas" class="form-control" onchange="filterSummary()">
                             <option value="Semua">Semua Petugas</option>
                             <!-- Diisi JS -->
                         </select>
                     </div>
                 </div>
 
-                <div style="text-align: right; margin-bottom: 1rem;">
-                    <button class="btn btn-success" onclick="filterSummary()">Tampilkan Ringkasan</button>
-                </div>
-
-                <!-- Hasil Filter -->
-                <div id="summaryResultContainer" style="display:none;">
+                <!-- Hasil Filter (DISPLAY BLOCK by default logic) -->
+                <div id="summaryResultContainer">
                     <div class="summary-result-box">
                         <div class="summary-item">
                             <div class="summary-title">Total Transaksi</div>
@@ -462,7 +458,9 @@
 
     <script>
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2dLrH58ZrnlI1dH2fDTOJDhFYQWytg_wbSTvah25q-F429yUXqJce_W-eD1Iv0NEW6A/exec"; 
-        if(GOOGLE_SCRIPT_URL.includes("PASTE")) alert("Masukkan URL Google Script!");
+        if(GOOGLE_SCRIPT_URL.includes("PASTE")) {
+            // Jangan alert di awal, biarkan user memasukkan nanti
+        }
         
         const RATES = { g1: 2000, g2: 5000, g3: 7000, g4: 10000 };
         const BULAN_NAMA = [
@@ -480,7 +478,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initDateDropdowns();
-            initFilterDropdowns(); // Init filter dropdowns
+            initFilterDropdowns();
             const today = new Date();
             const dateStr = today.toISOString().split('T')[0];
             document.getElementById('printDate').value = dateStr;
@@ -529,7 +527,7 @@
                 const opt = document.createElement('option');
                 opt.value = i;
                 opt.textContent = i;
-                if(i === currentYear) opt.selected = true; // Default tahun ini
+                if(i === currentYear) opt.selected = true;
                 fYear.appendChild(opt);
             }
 
@@ -574,11 +572,19 @@
             const now = new Date();
             const currentMonthYear = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
             let lastSeq = 0;
-            if(dataList && dataList.length > 0) {
-                const lastTxSameMonth = dataList.find(tx => tx.printDate.startsWith(currentMonthYear));
+            
+            // Pastikan dataList adalah array
+            if (Array.isArray(dataList) && dataList.length > 0) {
+                const lastTxSameMonth = dataList.find(tx => tx.printDate && tx.printDate.startsWith(currentMonthYear));
                 if(lastTxSameMonth) {
                     const parts = lastTxSameMonth.receiptNo.split('/');
-                    if(parts.length >= 3) lastSeq = parseInt(parts[2]);
+                    // PARSING YANG LEBIH ROBUST
+                    if(parts.length >= 3) {
+                        let seq = parseInt(parts[2]);
+                        // Jika NaN (misal data kotor), reset ke 0
+                        if(isNaN(seq)) seq = 0;
+                        lastSeq = seq;
+                    }
                 }
             }
             const nextSeq = lastSeq + 1;
@@ -587,7 +593,26 @@
         }
 
         function fetchLastReceiptNumber() {
-            fetch(GOOGLE_SCRIPT_URL).then(r=>r.json()).then(data => { transactions = data; updateReceiptNumberDisplay(transactions); }).catch(e=>console.log(e));
+            if(!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("PASTE")) {
+                // Jika URL belum diisi, set default manual agar input tidak kosong
+                document.getElementById('receiptNo').value = "SIMPAN URL SCRIPT";
+                return;
+            }
+
+            fetch(GOOGLE_SCRIPT_URL)
+                .then(r=>r.json())
+                .then(data => { 
+                    transactions = data; 
+                    updateReceiptNumberDisplay(transactions); 
+                })
+                .catch(err => {
+                    console.error("Gagal ambil nomor urut", err);
+                    // Jika gagal fetch, set default manual
+                    const now = new Date();
+                    const roman = toRoman(now.getMonth() + 1);
+                    document.getElementById('receiptNo').value = `KORP/BKL/???/${roman}/${now.getFullYear()}`;
+                    showToast("Gagal koneksi ke Google Sheet (Cek URL)", "error");
+                });
         }
 
         function fetchDataFromSheet() {
@@ -607,7 +632,10 @@
                     transactions = data;
                     processDashboardData(data);
                     showLoading(false);
-                }).catch(e=>{ showToast("Gagal ambil data", "error"); showLoading(false); });
+                }).catch(e=>{ 
+                    showToast("Gagal ambil data", "error"); 
+                    showLoading(false); 
+                });
             } else {
                 processDashboardData(transactions);
             }
@@ -662,9 +690,12 @@
                     monthlyBody.appendChild(tr);
                 });
             }
+
+            // --- AUTO TRIGGER RINGKASAN SETORAN ---
+            filterSummary();
         }
 
-        // --- FUNGSI RINGKASAN SETORAN (FILTER) ---
+        // --- FUNGSI RINGKASAN SETORAN ---
         function filterSummary() {
             const fBulan = document.getElementById('filterBulan').value;
             const fTahun = document.getElementById('filterTahun').value;
@@ -675,15 +706,15 @@
             let filteredData = [];
 
             transactions.forEach(tx => {
-                // Filter Bulan
-                if (fBulan !== "Semua" && tx.periodeBulan !== fBulan) return;
+                // Filter Bulan (Bandingkan string untuk aman)
+                if (fBulan !== "Semua" && String(tx.periodeBulan) !== fBulan) return;
                 // Filter Tahun
-                if (fTahun !== "Semua" && tx.periodeTahun != fTahun) return;
+                if (fTahun !== "Semua" && String(tx.periodeTahun) !== fTahun) return;
                 // Filter Petugas
                 if (fPetugas !== "Semua" && tx.receiverName !== fPetugas) return;
 
                 // Match
-                totalNominal += tx.totalBayar; // Menggunakan total bayar sebagai nominal setoran
+                totalNominal += tx.totalBayar; 
                 count++;
                 filteredData.push(tx);
             });
@@ -722,6 +753,13 @@
 
         document.getElementById('transactionForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            
+            // Cek URL Script sebelum submit
+            if(GOOGLE_SCRIPT_URL.includes("PASTE")) {
+                alert("URL Google Script belum dimasukkan di dalam kode!");
+                return;
+            }
+
             const calcs = calculateTotal();
             if (calcs.total === 0) return showToast("Total tidak boleh 0", "error");
             
@@ -750,7 +788,7 @@
                         fetchLastReceiptNumber();
                         resetForm();
                     } else { showToast("Gagal: " + res.message, "error"); }
-                }).catch(err => { showLoading(false); showToast("Error koneksi", "error"); });
+                }).catch(err => { showLoading(false); showToast("Error koneksi ke Google", "error"); });
         });
 
         function resetForm() {
