@@ -46,7 +46,6 @@
         .form-group input, .form-group select { width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem; }
         .form-group input[readonly] { background-color: #e5e7eb; cursor: not-allowed; }
         
-        /* Combo input group for period */
         .input-group { display: flex; gap: 0.5rem; }
 
         /* Buttons */
@@ -192,7 +191,7 @@
         .sig-date { margin-bottom: 2px; }
         .sig-title { margin-bottom: 2px; font-weight: bold; }
         .sig-space { height: 25px; }
-        .sig-name { text-decoration: underline; font-weight: bold; display: block; margin-top: 2px;}
+        .sig-name { text-decoration: underline; font-weight: bold; display: block; margin-top: 2px; word-wrap: break-word; line-height: 1.2;}
         .sig-nip { font-size: 6pt; }
 
     </style>
@@ -200,7 +199,7 @@
 <body>
 
     <aside>
-        <h1>Keuangan OPD <br><small style="font-size:0.7em; color:#666">(KORPRI Bangkalan)</small></h1>
+        <h1>Keuangan OPD <br><small style="font-size:0.7em; color:#666">(KORP/BKL)</small></h1>
         <nav>
             <button id="nav-entry" class="active" onclick="switchTab('entry')">📝 Entri Transaksi</button>
             <button id="nav-report" onclick="switchTab('report')">📊 Laporan Data (Sheet)</button>
@@ -222,21 +221,27 @@
                     </div>
                     <div class="form-grid">
                         <div class="form-group"><label>Nama Penyetor</label><input type="text" id="depositorName" required></div>
-                        <div class="form-group"><label>OPD / Unit Kerja</label><input type="text" id="opdName" required></div>
+                        <div class="form-group"><label>Nama OPD</label><input type="text" id="opdName" required></div>
                         <div class="form-group"><label>Tanggal Setor</label><input type="date" id="depositDate" required></div>
                     </div>
                     
-                    <!-- INPUT PERIODE BARU -->
+                    <!-- INPUT PETUGAS PENERIMA BARU -->
+                    <div class="form-group">
+                        <label>Petugas Penerima</label>
+                        <select id="receiverName" required>
+                            <option value="Dewi Aniza, SE.MM">Dewi Aniza, SE.MM</option>
+                            <option value="Dita Ayuningtyas P, SE">Dita Ayuningtyas P, SE</option>
+                            <option value="Rusdi Mardiyanto, SH">Rusdi Mardiyanto, SH</option>
+                            <option value="Samsuri, SE">Samsuri, SE</option>
+                        </select>
+                    </div>
+
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Periode Setoran</label>
                             <div class="input-group">
-                                <select id="periodeBulan" required>
-                                    <!-- Diisi oleh JS -->
-                                </select>
-                                <select id="periodeTahun" required>
-                                    <!-- Diisi oleh JS -->
-                                </select>
+                                <select id="periodeBulan" required></select>
+                                <select id="periodeTahun" required></select>
                             </div>
                         </div>
                     </div>
@@ -272,7 +277,7 @@
                 </div>
                 <div style="overflow-x: auto;">
                     <table class="data-table">
-                        <thead><tr><th>No Kwitansi</th><th>Tgl Cetak</th><th>Penyetor</th><th>Periode</th><th>OPD</th><th>Total</th><th>50%</th><th>Aksi</th></tr></thead>
+                        <thead><tr><th>No Kwitansi</th><th>Tgl Cetak</th><th>Penyetor</th><th>Periode</th><th>Petugas</th><th>Total</th><th>50%</th><th>Aksi</th></tr></thead>
                         <tbody id="reportTableBody"></tbody>
                     </table>
                 </div>
@@ -315,33 +320,27 @@
         let transactions = [];
 
         document.addEventListener('DOMContentLoaded', () => {
-            initDateDropdowns(); // Inisialisasi dropdown bulan/tahun
-            
+            initDateDropdowns();
             const today = new Date();
             const dateStr = today.toISOString().split('T')[0];
             document.getElementById('printDate').value = dateStr;
             document.getElementById('depositDate').value = dateStr;
-            
             fetchLastReceiptNumber();
         });
 
-        // Fungsi baru untuk mengisi dropdown Bulan & Tahun
         function initDateDropdowns() {
             const monthSelect = document.getElementById('periodeBulan');
             const yearSelect = document.getElementById('periodeTahun');
             const currentYear = new Date().getFullYear();
 
-            // Isi Bulan
             BULAN_NAMA.forEach((bln, index) => {
                 const option = document.createElement('option');
                 option.value = bln;
                 option.textContent = bln;
-                // Set default ke bulan sekarang (index 0-11)
                 if(index === new Date().getMonth()) option.selected = true;
                 monthSelect.appendChild(option);
             });
 
-            // Isi Tahun (3 tahun ke belakang, 1 tahun ke depan)
             for(let i = currentYear - 1; i <= currentYear + 1; i++) {
                 const option = document.createElement('option');
                 option.value = i;
@@ -390,7 +389,8 @@
             }
             const nextSeq = lastSeq + 1;
             const roman = toRoman(now.getMonth() + 1);
-            document.getElementById('receiptNo').value = `KWITANSI/${String(nextSeq).padStart(3, '0')}/${roman}/${now.getFullYear()}`;
+            // PERUBAHAN: Prefix KWITANSI menjadi KORP/BKL
+            document.getElementById('receiptNo').value = `KORP/BKL/${String(nextSeq).padStart(3, '0')}/${roman}/${now.getFullYear()}`;
         }
 
         function fetchLastReceiptNumber() {
@@ -418,8 +418,9 @@
                 depositor: document.getElementById('depositorName').value,
                 opd: document.getElementById('opdName').value,
                 depositDate: document.getElementById('depositDate').value,
-                periodeBulan: document.getElementById('periodeBulan').value, // DATA BARU
-                periodeTahun: document.getElementById('periodeTahun').value, // DATA BARU
+                receiverName: document.getElementById('receiverName').value, // DATA BARU
+                periodeBulan: document.getElementById('periodeBulan').value, 
+                periodeTahun: document.getElementById('periodeTahun').value, 
                 details: calcs, 
                 totalBayar: calcs.total, 
                 bayar50: calcs.fiftyPercent
@@ -441,11 +442,13 @@
         function resetForm() {
             document.getElementById('depositorName').value = '';
             document.getElementById('opdName').value = '';
+            // Reset petugas ke default (pilihan pertama)
+            document.getElementById('receiverName').selectedIndex = 0;
             ['G1','G2','G3','G4'].forEach(g => document.getElementById('qty'+g).value = 0);
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('printDate').value = today;
             document.getElementById('depositDate').value = today;
-            initDateDropdowns(); // Reset dropdown ke default
+            initDateDropdowns();
             fetchLastReceiptNumber();
             calculateTotal();
         }
@@ -457,10 +460,9 @@
             document.getElementById('emptyState').style.display = 'none';
             transactions.forEach(tx => {
                 const tr = document.createElement('tr');
-                // Menampilkan Periode di tabel laporan
                 const periodeStr = `${tx.periodeBulan || ''} ${tx.periodeTahun || ''}`.trim();
                 tr.innerHTML = `<td>${tx.receiptNo}</td><td>${formatDate(tx.printDate)}</td><td>${tx.depositor}</td>
-                <td>${periodeStr}</td><td>${tx.opd}</td><td>${formatRupiah(tx.totalBayar)}</td><td>${formatRupiah(tx.bayar50)}</td>
+                <td>${periodeStr}</td><td>${tx.receiverName || '-'}</td><td>${formatRupiah(tx.totalBayar)}</td><td>${formatRupiah(tx.bayar50)}</td>
                 <td><button class="btn btn-primary" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick='reprintTx(${JSON.stringify(tx)})'>Cetak</button></td>`;
                 tbody.appendChild(tr);
             });
@@ -506,8 +508,9 @@
                             <div class="data-label">Telah terima dari</div>
                             <div class="data-value">${data.depositor}</div>
                         </div>
+                        <!-- PERUBAHAN: Label "Untuk Pembayaran" menjadi "Nama OPD" -->
                         <div class="data-row">
-                            <div class="data-label">Untuk Pembayaran</div>
+                            <div class="data-label">Nama OPD</div>
                             <div class="data-value">${data.opd}</div>
                         </div>
                         <div class="data-row">
@@ -558,7 +561,8 @@
                         <div class="sig-date">${formatDate(data.printDate)}</div>
                         <div class="sig-title">Penerima,</div>
                         <div class="sig-space"></div>
-                        <span class="sig-name">Nama Bendahara</span>
+                        <!-- PERUBAHAN: TTD Penerima mengambil data dari receiverName -->
+                        <span class="sig-name">${data.receiverName}</span>
                         <div class="sig-nip">NIP. ............................</div>
                     </div>
                 </div>
