@@ -80,7 +80,7 @@
         .form-group { margin-bottom: 1rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 500; }
         .form-group input, .form-group select { width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem; }
-        .form-group input[readonly] { background-color: #e5e7eb; cursor: not-allowed; }
+        .form-group input[readonly] { background-color: #e5e7eb; cursor: not-allowed; font-weight: bold; color: #000; }
         
         .input-group { display: flex; gap: 0.5rem; }
 
@@ -250,6 +250,19 @@
         .sig-name { text-decoration: underline; font-weight: bold; display: block; margin-top: 2px; word-wrap: break-word; line-height: 1.2;}
         .sig-nip { font-size: 6pt; }
 
+        /* BLOCKING MODAL STYLE (NEW) */
+        .blocking-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(220, 38, 38, 0.95); z-index: 9999;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center;
+        }
+        .blocking-content {
+            background: white; padding: 2rem; border-radius: 8px; max-width: 500px;
+            border: 2px solid #ef4444; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .error-icon { font-size: 3rem; color: #ef4444; margin-bottom: 1rem; }
+
     </style>
 </head>
 <body>
@@ -279,7 +292,7 @@
                 </div>
             </div>
 
-            <!-- 2. Ringkasan Setoran (OTOMATIS TAMPIL) -->
+            <!-- 2. Ringkasan Setoran -->
             <div class="card">
                 <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--primary-color);">🔍 Ringkasan Setoran (Nominal)</h3>
                 
@@ -307,7 +320,7 @@
                     </div>
                 </div>
 
-                <!-- Hasil Filter (DISPLAY BLOCK by default logic) -->
+                <!-- Hasil Filter -->
                 <div id="summaryResultContainer">
                     <div class="summary-result-box">
                         <div class="summary-item">
@@ -454,12 +467,38 @@
         </div>
     </div>
 
+    <!-- BLOCKING MODAL -->
+    <div id="blockingModal" class="blocking-modal">
+        <div class="blocking-content">
+            <div class="error-icon">⚠️</div>
+            <h2 style="color:#ef4444; margin-bottom:1rem;">Error Konfigurasi Kritikal</h2>
+            <p style="margin-bottom:1.5rem; text-align: left; line-height: 1.6;">
+                <strong>Aplikasi tidak dapat dijalankan karena URL Google Script belum dikonfigurasi dengan benar.</strong><br><br>
+                <em>Tindakan Perbaikan:</em>
+                <ol style="text-align: left; margin-left: 20px; font-size: 0.9rem;">
+                    <li>Buka file HTML ini di Text Editor (Notepad/VS Code).</li>
+                    <li>Cari variabel <code>const GOOGLE_SCRIPT_URL = "PASTE...";</code> di bagian bawah (dekat `const GOOGLE_SCRIPT_URL = ...` baris).</li>
+                    <li>Ganti teks tersebut dengan <strong>Web App URL</strong> dari Google Apps Script.</li>
+                    <li>Pastikan di Google Apps Script: <strong>New Deployment > Execute as: Me</strong> dan <strong>Who has access: Anyone</strong>.</li>
+                </ol>
+            </p>
+            <button onclick="location.reload()" class="btn btn-primary">Coba Lagi Setelah Perbaiki</button>
+        </div>
+    </div>
+
     <div id="toast" class="toast">Pesan notifikasi</div>
 
     <script>
+        // ==========================================================
+        // 1. KONFIGURASI URL (WAJIB DIISI OLEH USER)
+        // ==========================================================
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzUIqSYISFjy_RRAcTVOz355ZTvtO_y_o986sa72LiSUfBKUkRiAJp1PkHn7H60X6_5wA/exec"; 
-        if(GOOGLE_SCRIPT_URL.includes("PASTE")) {
-            // Jangan alert di awal, biarkan user memasukkan nanti
+        
+        // Cek URL saat load halaman (Untuk mencegah error no data)
+        if (GOOGLE_SCRIPT_URL.includes("PASTE") || !GOOGLE_SCRIPT_URL) {
+            document.getElementById('blockingModal').style.display = 'flex';
+            // Stop execution jangan jalankan kode lain
+            throw new Error("URL Script belum diisi");
         }
         
         const RATES = { g1: 2000, g2: 5000, g3: 7000, g4: 10000 };
@@ -477,15 +516,20 @@
         let transactions = [];
 
         document.addEventListener('DOMContentLoaded', () => {
-            initDateDropdowns();
-            initFilterDropdowns();
-            const today = new Date();
-            const dateStr = today.toISOString().split('T')[0];
-            document.getElementById('printDate').value = dateStr;
-            document.getElementById('depositDate').value = dateStr;
-            
-            // Default load dashboard
-            switchTab('dashboard'); 
+            // Jika URL sudah valid, lanjut inisialisasi
+            try {
+                initDateDropdowns();
+                initFilterDropdowns();
+                const today = new Date();
+                const dateStr = today.toISOString().split('T')[0];
+                document.getElementById('printDate').value = dateStr;
+                document.getElementById('depositDate').value = dateStr;
+                
+                // Default load dashboard
+                switchTab('dashboard'); 
+            } catch (e) {
+                console.error("Init Error", e);
+            }
         });
 
         function initDateDropdowns() {
@@ -511,7 +555,6 @@
         }
 
         function initFilterDropdowns() {
-            // Init Bulan Filter
             const fMonth = document.getElementById('filterBulan');
             BULAN_NAMA.forEach(bln => {
                 const opt = document.createElement('option');
@@ -520,7 +563,6 @@
                 fMonth.appendChild(opt);
             });
 
-            // Init Tahun Filter
             const fYear = document.getElementById('filterTahun');
             const currentYear = new Date().getFullYear();
             for(let i = currentYear - 2; i <= currentYear; i++) {
@@ -531,7 +573,6 @@
                 fYear.appendChild(opt);
             }
 
-            // Init Petugas Filter
             const fPetugas = document.getElementById('filterPetugas');
             PETUGAS_LIST.forEach(name => {
                 const opt = document.createElement('option');
@@ -578,10 +619,9 @@
                 const lastTxSameMonth = dataList.find(tx => tx.printDate && tx.printDate.startsWith(currentMonthYear));
                 if(lastTxSameMonth) {
                     const parts = lastTxSameMonth.receiptNo.split('/');
-                    // PARSING YANG LEBIH ROBUST
+                    // PARSING ROBUST
                     if(parts.length >= 3) {
                         let seq = parseInt(parts[2]);
-                        // Jika NaN (misal data kotor), reset ke 0
                         if(isNaN(seq)) seq = 0;
                         lastSeq = seq;
                     }
@@ -593,24 +633,21 @@
         }
 
         function fetchLastReceiptNumber() {
-            if(!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("PASTE")) {
-                // Jika URL belum diisi, set default manual agar input tidak kosong
-                document.getElementById('receiptNo').value = "SIMPAN URL SCRIPT";
-                return;
-            }
-
+            showLoading(true);
             fetch(GOOGLE_SCRIPT_URL)
                 .then(r=>r.json())
                 .then(data => { 
                     transactions = data; 
                     updateReceiptNumberDisplay(transactions); 
+                    showLoading(false);
                 })
                 .catch(err => {
+                    showLoading(false);
                     console.error("Gagal ambil nomor urut", err);
                     // Jika gagal fetch, set default manual
                     const now = new Date();
                     const roman = toRoman(now.getMonth() + 1);
-                    document.getElementById('receiptNo').value = `KORP/BKL/???/${roman}/${now.getFullYear()}`;
+                    document.getElementById('receiptNo').value = `GAGAL FETCH DATA (Cek URL Script)`;
                     showToast("Gagal koneksi ke Google Sheet (Cek URL)", "error");
                 });
         }
@@ -627,6 +664,7 @@
         // --- FUNGSI DASHBOARD ---
         function renderDashboard() {
             if(transactions.length === 0) {
+                // Jika data di memori kosong, fetch dulu
                 showLoading(true);
                 fetch(GOOGLE_SCRIPT_URL).then(r=>r.json()).then(data => {
                     transactions = data;
@@ -706,7 +744,7 @@
             let filteredData = [];
 
             transactions.forEach(tx => {
-                // Filter Bulan (Bandingkan string untuk aman)
+                // Filter Bulan
                 if (fBulan !== "Semua" && String(tx.periodeBulan) !== fBulan) return;
                 // Filter Tahun
                 if (fTahun !== "Semua" && String(tx.periodeTahun) !== fTahun) return;
@@ -754,16 +792,17 @@
         document.getElementById('transactionForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Cek URL Script sebelum submit
-            if(GOOGLE_SCRIPT_URL.includes("PASTE")) {
-                alert("URL Google Script belum dimasukkan di dalam kode!");
-                return;
-            }
-
             const calcs = calculateTotal();
             if (calcs.total === 0) return showToast("Total tidak boleh 0", "error");
             
             const receiptNo = document.getElementById('receiptNo').value;
+            
+            // Cek receiptNo valid
+            if(receiptNo.includes("GAGAL") || receiptNo.includes("???")) {
+                showToast("Nomor Kwitansi tidak valid. Cek koneksi ke Google Sheet.", "error");
+                return;
+            }
+
             const formData = {
                 receiptNo, 
                 printDate: document.getElementById('printDate').value,
@@ -914,7 +953,7 @@
                         <div class="sig-title">Penerima,</div>
                         <div class="sig-space"></div>
                         <span class="sig-name">${data.receiverName}</span>
-                        <div class="sig-nip">NIP. ............................</div>
+                        
                     </div>
                 </div>
             `;
