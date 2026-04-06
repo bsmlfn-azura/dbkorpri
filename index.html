@@ -430,17 +430,31 @@
         <!-- REPORT SECTION -->
         <section id="section-report" class="section">
             <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h2>Laporan Data</h2>
-                    <button class="btn btn-secondary" onclick="fetchDataFromSheet()">🔄 Refresh</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <h2>Laporan Data Transaksi</h2>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; width: 100%; max-width: 600px; justify-content: flex-end;">
+                        <!-- FITUR PENCARIAN -->
+                        <div class="search-wrapper">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="searchReport" placeholder="Cari Nama / No Kwitansi / OPD..." onkeyup="renderReport()">
+                        </div>
+                        <button class="btn btn-secondary btn-sm" onclick="fetchDataFromSheet()">🔄 Refresh</button>
+                    </div>
                 </div>
-                <div style="overflow-x: auto;">
+                
+                <div style="overflow-x: auto; border: 1px solid var(--border-color); border-radius: 8px;">
                     <table class="data-table">
-                        <thead><tr><th>No Kwitansi</th><th>Tgl Cetak</th><th>Penyetor</th><th>Periode</th><th>Petugas</th><th>Total</th><th>50%</th><th>Aksi</th></tr></thead>
+                        <thead><tr><th>No Kwitansi</th><th>Tgl Cetak</th><th>Penyetor</th><th>OPD</th><th>Periode</th><th>Petugas</th><th style="text-align:right;">Total</th><th style="text-align:right;">50%</th><th>Aksi</th></tr></thead>
                         <tbody id="reportTableBody"></tbody>
                     </table>
                 </div>
-                <div id="emptyState" style="text-align: center; padding: 2rem; color: #6b7280; display: none;">Belum ada data.</div>
+                <div id="emptyState" style="text-align: center; padding: 3rem; color: #9ca3af; display: none;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                    <p>Belum ada data transaksi.</p>
+                </div>
+                <div id="noResultState" style="text-align: center; padding: 2rem; color: #ef4444; display: none;">
+                    <p>Data tidak ditemukan dengan kata kunci tersebut.</p>
+                </div>
             </div>
         </section>
     </main>
@@ -840,19 +854,60 @@
         }
 
         function renderReport() {
+            // Ambil nilai dari input pencarian
+            const searchVal = document.getElementById('searchReport').value.toLowerCase();
+            
             const tbody = document.getElementById('reportTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const noResultState = document.getElementById('noResultState');
+            
             tbody.innerHTML = '';
-            if (transactions.length === 0) { document.getElementById('emptyState').style.display = 'block'; return; }
-            document.getElementById('emptyState').style.display = 'none';
-            transactions.forEach(tx => {
+            
+            // Filter data berdasarkan keyword pencarian
+            const filteredData = transactions.filter(tx => {
+                const matchReceipt = tx.receiptNo && tx.receiptNo.toLowerCase().includes(searchVal);
+                const matchDepositor = tx.depositor && tx.depositor.toLowerCase().includes(searchVal);
+                const matchOpd = tx.opd && tx.opd.toLowerCase().includes(searchVal);
+                
+                return matchReceipt || matchDepositor || matchOpd;
+            });
+
+            if (transactions.length === 0) { 
+                emptyState.style.display = 'block';
+                noResultState.style.display = 'none';
+                return; 
+            } else {
+                emptyState.style.display = 'none';
+            }
+
+            if (filteredData.length === 0 && searchVal !== "") {
+                noResultState.style.display = 'block';
+            } else {
+                noResultState.style.display = 'none';
+            }
+            
+            // Sort descending berdasarkan tanggal
+            const sortedTx = [...filteredData].sort((a,b) => new Date(b.printDate) - new Date(a.printDate));
+
+            sortedTx.forEach(tx => {
                 const tr = document.createElement('tr');
                 const periodeStr = `${tx.periodeBulan || ''} ${tx.periodeTahun || ''}`.trim();
-                tr.innerHTML = `<td>${tx.receiptNo}</td><td>${formatDate(tx.printDate)}</td><td>${tx.depositor}</td>
-                <td>${periodeStr}</td><td>${tx.receiverName || '-'}</td><td>${formatRupiah(tx.totalBayar)}</td><td>${formatRupiah(tx.bayar50)}</td>
-                <td><button class="btn btn-primary" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick='reprintTx(${JSON.stringify(tx)})'>Cetak</button></td>`;
+                tr.innerHTML = `
+                    <td>${tx.receiptNo}</td>
+                    <td>${formatDate(tx.printDate)}</td>
+                    <td>${tx.depositor}</td>
+                    <td>${tx.opd}</td>
+                    <td>${periodeStr}</td>
+                    <td>${tx.receiverName || '-'}</td>
+                    <td style="text-align:right;">${formatRupiah(tx.totalBayar)}</td>
+                    <td style="text-align:right; font-weight:bold;">${formatRupiah(tx.bayar50)}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick='reprintTx(${JSON.stringify(tx)})'>🖨 Cetak</button>
+                    </td>`;
                 tbody.appendChild(tr);
             });
         }
+
 
         function showPrintPreview(data) {
             const html = generateReceiptHTML(data);
