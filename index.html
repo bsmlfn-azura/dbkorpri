@@ -447,7 +447,7 @@
                     </table>
                     <div style="display: flex; justify-content: space-between; align-items: center; background: #f0fdf4; padding: 1rem; border: 1px solid #bbf7d0; border-radius: 6px; margin-bottom: 1.5rem;">
                         <div><strong>Total:</strong> <span id="displayTotalBayar" style="font-size: 1.2rem;">Rp 0</span></div>
-                        <div><strong>50%:</strong> <span id="displayBayar50" style="font-size: 1.2rem; color: var(--primary-color);">Rp 0</span></div>
+                        <div><strong>Setor 50%:</strong> <span id="displayBayar50" style="font-size: 1.2rem; color: var(--primary-color);">Rp 0</span></div>
                     </div>
                     <div class="form-grid">
                         <div class="form-group">
@@ -881,6 +881,7 @@
         function resetForm() {
             document.getElementById('depositorName').value = '';
             document.getElementById('opdName').value = '';
+            document.getElementById('keterangan').value = '';
             document.getElementById('receiverName').selectedIndex = 0;
             ['G1','G2','G3','G4'].forEach(g => document.getElementById('qty'+g).value = 0);
             const today = new Date().toISOString().split('T')[0];
@@ -1023,7 +1024,7 @@
                     <!-- Kanan: Total Bayar -->
                     <div class="mid-right">
                         <div class="total-box">
-                            <span class="total-label">TOTAL BAYAR</span>
+                            <span class="total-label">TOTAL</span>
                             <span class="total-amount">${formatRupiah(data.totalBayar)}</span>
                         </div>
                         <div class="total-box highlight-total">
