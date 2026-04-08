@@ -857,11 +857,12 @@
                 depositDate: document.getElementById('depositDate').value,
                 receiverName: document.getElementById('receiverName').value,
                 periodeBulan: document.getElementById('periodeBulan').value, 
-                periodeTahun: document.getElementById('periodeTahun').value, 
+                periodeTahun: document.getElementById('periodeTahun').value,
+                keterangan: document.getElementById('keterangan').value,
                 details: calcs, 
                 totalBayar: calcs.total, 
-                bayar50: calcs.fiftyPercent,
-                keterangan: document.getElementById('keterangan').value
+                bayar50: calcs.fiftyPercent
+                
             };
 
             showLoading(true);
@@ -1015,7 +1016,7 @@
                         <div class="terbilang-box">"${terbilang(data.bayar50)} Rupiah"</div>
                         <div class="data-row">
                             <div class="data-label">Keterangan : </div>
-                            <div class="data-value">${formatDate(data.keterangan)}</div>
+                            <div class="data-value">${data.keterangan}</div>
                         </div>
                     </div>
 
