@@ -854,7 +854,8 @@
                 periodeTahun: document.getElementById('periodeTahun').value, 
                 details: calcs, 
                 totalBayar: calcs.total, 
-                bayar50: calcs.fiftyPercent
+                bayar50: calcs.fiftyPercent,
+                keterangan: document.getElementById('keterangan').value
             };
 
             showLoading(true);
@@ -1006,6 +1007,10 @@
                         </table>
                         
                         <div class="terbilang-box">"${terbilang(data.bayar50)} Rupiah"</div>
+                        <div class="data-row">
+                            <div class="data-label">Keterangan : </div>
+                            <div class="data-value">${formatDate(data.keterangan)}</div>
+                        </div>
                     </div>
 
                     <!-- Kanan: Total Bayar -->
